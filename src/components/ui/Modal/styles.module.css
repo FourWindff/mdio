@@ -1,0 +1,67 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ *
+ */
+
+.overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  flex-direction: column;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(40, 40, 40, 0.6);
+  flex-grow: 0;
+  flex-shrink: 1;
+  z-index: 100;
+}
+
+.modal {
+  padding: 20px;
+  min-height: 100px;
+  min-width: 300px;
+  display: flex;
+  flex-grow: 0;
+  background-color: var(--background-tertiary);
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 2px 0 #444;
+  border-radius: 10px;
+}
+
+.title {
+  color: var(--text-white-color);
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.closeButton {
+  border: 0;
+  position: absolute;
+  right: 20px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.closeButton:hover {
+  background-color: #ddd;
+}
+
+.content {
+  padding-top: 20px;
+}

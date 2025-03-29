@@ -1,0 +1,265 @@
+/* 美化后的 Gemini 对话框样式 */
+.gemini-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 650px;
+  max-width: 92vw;
+  background: #333333;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.gemini-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.gemini-dialog-header:after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #8e2de2, #4a00e0);
+  border-radius: 2px;
+}
+
+
+
+.selected-text-indicator {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #e6f7ff, #e0f2fe);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0369a1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.clear-selection {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #64748b;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.clear-selection:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #334155;
+}
+
+.gemini-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-section label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.gemini-prompt {
+  width: 100%;
+  padding: 14px;
+  background-color:var(--background-secondary);
+  border-radius: 8px;
+  font-size: 15px;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-family: inherit;
+  caret-color: var(--text-white-color);
+  color:var(--text-white-color)
+}
+
+.gemini-prompt:focus {
+  outline: none;
+  
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.gemini-prompt:focus::placeholder {
+  color: transparent;
+}
+
+.gemini-prompt::placeholder {
+  color: var(--text-white-color);
+  font-style: italic;
+}
+
+.gemini-prompt:disabled {
+  background-color: #f8fafc;
+  color: #ffffff;
+}
+
+.context-section {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  animation: slideUp 0.3s ease-out;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.context-header h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fdfdfd;
+}
+
+.context-content {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.context-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.context-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.context-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 6px;
+}
+
+.context-content pre {
+  white-space: pre-wrap;
+  margin: 0;
+  font-family: inherit;
+  color: #475569;
+}
+
+.gemini-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  color: white;
+  border: none;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.35);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.4);
+}
+
+.primary-button:disabled {
+  background: linear-gradient(135deg, #a5b4fc, #818cf8);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+
+.secondary-button:active {
+  background-color: #f1f5f9;
+}
+
+.secondary-button:disabled {
+  color: #94a3b8;
+  border-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
+/* 添加加载动画 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.loading-text:after {
+  content: "...";
+  animation: loadingDots 1.5s infinite;
+  width: 16px;
+  text-align: left;
+  margin-left: 3px;
+}
+
+@keyframes loadingDots {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
+  100% { content: ""; }
+}

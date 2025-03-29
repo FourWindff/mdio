@@ -1,0 +1,159 @@
+.fileExplorer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 允许内容收缩 */
+}
+
+
+.actionButtons {
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  padding: 5px;
+
+}
+
+.actionButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.openFolderButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+.openFolderButton:hover {
+  background: #f8fafc;
+}
+
+.fileList {
+  flex: 1;
+  overflow: auto;
+  min-width: 0; /* 允许内容收缩 */
+  padding: 8px;
+}
+
+.fileList::-webkit-scrollbar {
+  display: none;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  min-width: 0; /* 允许内容收缩 */
+  width: calc(100% - 8px); /* 考虑 margin */
+}
+
+.fileItem:hover:not(.selected) {
+  background-color: var(--item-hover-background);
+}
+
+.selected {
+  background-color: var(--item-selected-background);
+  color: var(--item-selected-foreground);
+}
+
+
+
+.fileIcon {
+  flex-shrink: 0; /* 防止图标被压缩 */
+  margin-right: 8px;
+  width: 16px; /* 固定图标宽度 */
+  text-align: center;
+}
+
+.fileName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 400;
+  padding-right: 8px;
+  user-select: none;
+}
+
+.directory .fileName {
+  font-weight: 800;
+}
+
+
+.renameForm {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.renameInput {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #3794ff;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+  padding: 0 4px;
+  margin: -2px 0;
+  border-radius: 2px;
+}
+
+.renameInput:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+.icon{
+  margin-left: -5px;
+  margin-right: 5px;
+  background-size: contain;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  opacity: 0.6;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+/* 右键菜单栏 */
+.contextMenu {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  min-width: 160px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.contextMenuItem {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+.contextMenuItem:hover {
+  background-color: #f0f0f0;
+}
+
+.contextMenuDivider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}

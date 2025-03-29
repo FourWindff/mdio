@@ -1,0 +1,45 @@
+.input {
+  font-weight: bold;
+  font-size: 14px;
+  color: #777;
+  border-radius: 5px;
+  border-color: grey;
+  height: 15px;
+  padding: 2px 4px;
+  text-align: center;
+  width: 20px;
+  align-self: center;
+}
+
+.input:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.addIcon {
+  background-image: url(@assets/images/icons/add-sign.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.minusIcon {
+  background-image: url(@assets/images/icons/minus-sign.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.decrementBtn {
+  padding: 0px;
+  margin-right: 3px;
+}
+
+.incrementBtn {
+  padding: 0px;
+  margin-left: 3px;
+}

@@ -1,0 +1,36 @@
+.root {
+  border: 0;
+  font-size: 15px;
+  display: block;
+  position: relative;
+  outline: 0;
+  padding: 8px 28px 40px;
+  min-height: 150px;
+}
+
+.placeholder {
+  font-size: 15px;
+  color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 8px;
+  left: 28px;
+  right: 28px;
+  user-select: none;
+  white-space: nowrap;
+  display: inline-block;
+  pointer-events: none;
+}
+
+@media (max-width: 1025px) {
+  .root {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .placeholder {
+    left: 8px;
+    right: 8px;
+  }
+}

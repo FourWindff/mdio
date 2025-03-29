@@ -1,0 +1,22 @@
+.welcome {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--editor-background);
+}
+
+.content {
+  text-align: center;
+}
+
+.content h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.content p {
+  font-size: 1.2rem;
+  color: var(--foreground-secondary);
+}

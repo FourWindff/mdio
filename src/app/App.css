@@ -1,0 +1,309 @@
+:root {
+  /* 主题颜色 */
+  --background-primary: #252526;
+  --background-secondary: #2d2d2d;
+  --background-tertiary: #333333;
+  --text-white-color:#ffffff;
+  /* 活动栏颜色 */
+  --activity-bar-background: var(--background-secondary);
+  --activity-bar-foreground: #858585;
+  --activity-bar-active: #ffffff;
+  /* 边栏颜色 */
+  --sidebar-background: var(--background-primary);
+  --item-hover-background: rgb(64,105,225);
+  --item-selected-background: #333333;
+  --item-selected-foreground: var(--primary-foreground);
+  /* 按钮颜色 */
+  --button-hover-background: rgba(255, 255, 255, 0.1);
+}
+
+
+
+
+
+.app {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-primary);
+  color: var(--text-white-color);
+}
+
+.app-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  background-color: var(--background-tertiary);
+  -webkit-app-region: drag;
+}
+.app-header-left,
+.app-header-right {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+.app-title {
+  font-size: 20px;
+}
+.app-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+.app-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+/* 为了更好的滚动效果，可以添加以下样式 */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--background-tertiary);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--background-secondary);
+}
+
+.icon-btn {
+  -webkit-app-region: no-drag;
+  border: none;
+  background: none;
+  color: var(--activity-bar-foreground);
+  padding: 4px;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  border-radius: 4px;
+  background-color: var(--button-hover-background);
+}
+.icon-btn.active {
+  background-color: var(--button-hover-background);
+  border-radius: 4px;
+}
+i.icon {
+  background-size: contain;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  opacity: 0.6;
+  background-repeat: no-repeat;
+}
+
+.activity-bar {
+  width: 48px;
+  height: 100%;
+  background-color: var(--activity-bar-background);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.activity-bar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-button {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--activity-bar-foreground);
+  cursor: pointer;
+}
+
+.activity-button:hover {
+  color: var(--activity-bar-active);
+}
+
+.activity-button.active {
+  color: var(--activity-bar-active);
+}
+
+.activity-button.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 2px;
+  height: 48px;
+  background-color: var(--activity-bar-active);
+}
+
+
+
+/* 侧边栏样式 */
+.sidebar {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-shrink: 0;
+  transition: width 0.2s;
+}
+.resize-bar {
+  min-width: 200px;
+  height: 20px;
+  transform: scaleY(100);
+  overflow: scroll;
+  resize: horizontal;
+}
+.sidebar.left .resize-bar{
+  width:var(--left-width)
+}
+.sidebar.right .resize-bar {
+  direction: rtl;
+  width: var(--right-width);
+}
+.sidebar.right .resize-handle{
+  left: 0;
+}
+.sidebar.left .resize-handle{
+  right: 0;
+}
+.resize-bar::-webkit-scrollbar {
+  width: 5px;
+}
+.resize-bar::-webkit-resizer {
+  background-color: #333333;
+}
+.resize-handle{
+  position: absolute;
+  top: 0;
+  width: 5px;
+  bottom: 0;
+  background-color: royalblue;
+  opacity: 0;
+  transition: .3s;
+  pointer-events: none;
+}
+.resize-bar:hover+.resize-handle,
+.resize-bar:active+.resize-handle{
+  opacity: 1;
+}
+.sidebar .sidebar-content{
+  border-left: 1px solid var(--background-primary);
+  background-color: var(--background-primary);
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.sidebar.left .sidebar-content {
+  left:0;
+  right:5px;
+}
+.sidebar.right .sidebar-content{
+  right:0px;
+  left:5px;
+}
+.resize-bar.collapsed {
+  min-width: 0px !important;
+  width: 0px !important;
+}
+
+
+
+
+
+
+
+/* 内容容器样式 */
+.content-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 标签栏样式 */
+.tabs-bar {
+  display: flex;
+  background-color: var(--background-tertiary);
+  overflow-x: auto;
+  height: 36px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--background-primary);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  min-width: 100px;
+  max-width: 200px;
+  height: 36px;
+  border-right: 1px solid var(--background-primary);
+  background-color: var(--background-secondary);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.tab.active {
+  background-color: var(--background-primary);
+}
+
+.tab-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.tab-close {
+  background: none;
+  border: none;
+  color: var(--activity-bar-foreground);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.tab-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.file-content {
+  flex: 1;
+  overflow: auto;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--activity-bar-foreground);
+  font-size: 14px;
+}
+
+
+
+
