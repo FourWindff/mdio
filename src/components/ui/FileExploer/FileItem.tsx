@@ -1,11 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./styles.module.css";
 import { FileItem } from "@/types/types";
-import ContextMenu, { MenuItem } from "../ContextMenu";
-import useModal from "@/features/editor/hooks/useModal";
-import { DialogActions } from "../Dialog/Dialog";
-import Button from "../Button";
 import { useWorkspace } from "@/context/WorkSpace/WorkspaceContext";
+import SidebarContextMenu from "../ContextMenu/sidebar";
+import useModal from "@/features/editor/hooks/useModal";
+
 
 interface FileItemProps {
   file: FileItem;
@@ -16,17 +15,18 @@ export const FileItemComponent = ({
   file,
   depth = 0,
 }: FileItemProps) => {
-  const { state, handleToggleExpand, handleActiveFile } = useWorkspace();
+  const { state, handleToggleExpand, handleActiveFile, handleActiveItem } = useWorkspace();
   const isExpanded = state.expandedFolders?.includes(file.path);
-  const isSelected=state.activeFile?.path===file.path;
+  const isSelected = state.activeFile?.path === file.path;
 
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
 
   const [editMode, setEditMode] = useState<boolean>(false);
   const [inputName, setInputName] = useState<string>(file.basename);
-  const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const pointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [modal, showModal] = useModal();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pointerRef = useRef<React.MouseEvent>(null);
+
 
   useEffect(() => {
     if (editMode && inputRef.current) {
@@ -51,18 +51,13 @@ export const FileItemComponent = ({
 
   const handleRename = () => {
     console.log("rename")
-  }
+  };
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       setInputName(file.basename); // 恢复原名称
       setEditMode(false);
       e.preventDefault();
     }
-  };
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    pointRef.current = { x: e.clientX, y: e.clientY };
-    setContextMenuVisible(true);
   };
   const handleOpen = () => {
     if (file.isDirectory) {
@@ -71,12 +66,24 @@ export const FileItemComponent = ({
     if (file.isFile) {
       handleActiveFile(file.path);
     }
-  }
+  };
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleActiveItem(file);
+    setContextMenuVisible(true);
+    pointerRef.current = e;
+  };
+
+
 
   return (
     <div
-      style={{ paddingLeft: `${depth * 8}px` }}
-      onContextMenu={handleContextMenu}
+      style={{ paddingLeft: `${depth * 5}px`}}
+      onContextMenu={(e: React.MouseEvent) =>
+        handleContextMenu(e)
+      }
+
     >
       <div
         className={`
@@ -105,7 +112,7 @@ export const FileItemComponent = ({
             />
           </form>
         ) : (
-          <span className={styles.fileName}>{file.basename}</span>
+          <span className={styles.fileName}>{file.name}</span>
         )}
       </div>
       {isExpanded &&
@@ -124,56 +131,16 @@ export const FileItemComponent = ({
             depth={depth + 1}
           />
         ))}
-      {/* 这个需要移动到外面,每个组件都加一个会有性能开销嘛 */}
-      {contextMenuVisible && (
-        <ContextMenu
-          pointRef={pointRef}
+      {contextMenuVisible &&
+        pointerRef.current &&
+        <SidebarContextMenu
+          event={pointerRef.current}
           onClose={() => setContextMenuVisible(false)}
-        >
-          <MenuItem
-            onClick={() => alert("复制")}
-            iconClassName="file-copy"
-            title="复制"
-          />
-          <MenuItem
-            onClick={() => alert("粘贴")}
-            iconClassName="file-paste"
-            title="粘贴"
-          />
-          <MenuItem
-            onClick={() => alert("移动")}
-            iconClassName="file-move"
-            title="移动"
-          />
-          <MenuItem
-            onClick={() => setEditMode(true)}
-            iconClassName="file-rename"
-            title="重命名"
-          />
-          <MenuItem
-            onClick={() =>
-              showModal("确定删除嘛", (onClose) => (
-                <>
-                  <h2>删除之后不可恢复</h2>
-                  <DialogActions>
-                    <Button
-                      onClick={() => {
-                        window.electron.deleteFile(file.path);
-                        //移除相关状态
-                      }}
-                    >
-                      确认
-                    </Button>
-                    <Button onClick={onClose}>取消</Button>
-                  </DialogActions>
-                </>
-              ))
-            }
-            iconClassName="file-delete"
-            title="删除"
-          />
-        </ContextMenu>
-      )}
+          item={file}
+          hasPasteCache={false}
+          showModal={showModal}
+        />
+      }
       {modal}
     </div>
   );

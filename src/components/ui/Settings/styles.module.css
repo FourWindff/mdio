@@ -1,0 +1,174 @@
+.settingsContainer {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    max-height: 80vh;
+    background-color: var(--background-primary);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: var(--text-primary-color);
+  }
+  
+  .settingsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .settingsHeader h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .closeButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+  
+  .closeButton:hover {
+    background-color: var(--item-hover-background);
+  }
+  
+  .settingsContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  
+  .settingsSection {
+    margin-bottom: 24px;
+  }
+  
+  .settingsSection h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary-color);
+  }
+  
+  .settingItem {
+    margin-bottom: 16px;
+  }
+  
+  .settingRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .themeOptions {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+  }
+  
+  .themeOption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  
+  .themeOption.selected {
+    background-color: var(--item-selected-background);
+    color: var(--item-selected-foreground);
+  }
+  
+  .themePreview {
+    width: 100px;
+    height: 60px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  .light {
+    background-color: #ffffff;
+  }
+  
+  .dark {
+    background-color: #1e1e1e;
+  }
+  
+  .system {
+    background: linear-gradient(to right, #ffffff 50%, #1e1e1e 50%);
+  }
+  
+  .proxySettings {
+    padding-left: 16px;
+    margin-top: 12px;
+    border-left: 2px solid var(--border-color);
+  }
+  
+  .settingsFooter {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
+    gap: 12px;
+  }
+  
+  .cancelButton, .saveButton {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .cancelButton {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary-color);
+  }
+  
+  .saveButton {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: white;
+  }
+  
+  .cancelButton:hover {
+    background-color: var(--item-hover-background);
+  }
+  
+  .saveButton:hover {
+    background-color: var(--primary-darker-color);
+  }
+  
+  /* 表单控件样式 */
+  .settingsContainer input[type="text"],
+  .settingsContainer input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-background);
+    color: var(--text-primary-color);
+    margin-top: 4px;
+  }
+  
+  .settingsContainer input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  
+  .settingsContainer label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-secondary-color);
+  }

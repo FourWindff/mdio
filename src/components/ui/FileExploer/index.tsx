@@ -1,24 +1,17 @@
-import { useState } from "react";
 import { FileItemComponent } from "./FileItem";
 import styles from "./styles.module.css";
-import { FileItem } from "@/types/types";
 import { useWorkspace } from "@/context/WorkSpace/WorkspaceContext";
-import { stat } from "fs";
+
 
 
 export default function FileExplorer() {
-  const [expandedState, setExpandedState] = useState<boolean>(false);
-  const [editItem, setEditItem] = useState<FileItem | null>(null);
+  
   const {
     state:{
       tree,
       workPath,
       isExpandedAll
     },
-    handleActiveFile,
-    handleActiveTab,
-    handleCloseTab,
-    handleCloseAllTabs,
     handleToggleExpandAll,
     handleOpenDirectory,
     handleCreateFile,

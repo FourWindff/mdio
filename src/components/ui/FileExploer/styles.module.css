@@ -60,8 +60,8 @@
   padding: 2px 8px;
   cursor: pointer;
   border-radius: 4px;
-  min-width: 0; /* 允许内容收缩 */
-  width: calc(100% - 8px); /* 考虑 margin */
+  min-width: 0;
+
 }
 
 .fileItem:hover:not(.selected) {

@@ -7,9 +7,11 @@ import { Preference } from "../preference";
 import { Workspace } from "../workspace";
 import log from "electron-log";
 import { IMAGE_TYPE, TEXT_TYPE } from "../../common/types";
+import { getUniquenName } from "../../common/filesystem/paths";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
+process.env.APP_ROOT = path.join(__dirname,".." );
+
 export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
@@ -146,6 +148,7 @@ class App {
         return null;
       }
     });
+
     ipcMain.handle("ask-for-read-file", async (_, filePath: string) => {
       try {
         const extension = path.extname(filePath).toLowerCase();
@@ -164,6 +167,92 @@ class App {
         throw error;
       }
     });
+
+    ipcMain.on(
+      "ask-for-create-directory",
+      async (_, parentPath: string, dirname: string) => {
+        const uniqueName=getUniquenName(parentPath,dirname);
+        const dirPath = path.join(parentPath, uniqueName);
+        const stat= await fs.stat(dirPath).catch(()=>false);
+        if(stat){
+          log.warn("Directory already exists:", dirPath);
+          return;
+        }
+        try {
+          await fs.mkdir(dirPath, { recursive: true });
+          log.info("Create new file",dirPath)
+        } catch (error) {
+          log.error("Error creating directory:", error);
+        }
+      }
+    );
+    ipcMain.on(
+      "ask-for-create-file",
+      async (_, parentPath: string, filename: string) => {
+        const uniqueName=getUniquenName(parentPath,filename);
+        const filePath = path.join(parentPath, uniqueName);
+        const stat= await fs.stat(filePath).catch(()=>false);
+        if(stat){
+          log.warn("File already exists:", filePath);
+          return;
+        }
+        try {
+          await fs.writeFile(filePath, "");
+          log.info("Create new file",filePath)
+        } catch (error) {
+          log.error("Error create file:", error);
+        }
+      }
+    );
+    ipcMain.on("ask-for-unlink", async (_, path: string) => {
+      await fs.stat(path).catch(() => {
+        log.warn("file does not exist:", path);
+        return;
+      });
+      try {
+        const stats = await fs.stat(path);
+        if (stats.isFile()) {
+          await fs.unlink(path);
+        }
+        if (stats.isDirectory()) {
+          await fs.rm(path, { recursive: true, force: true });
+        }
+      } catch (error) {
+        log.error("Unlink fail:", error);
+      }
+    });
+
+    ipcMain.on(
+      "ask-for-rename",
+      async (_, oldPath: string, newName: string) => {
+        await fs.stat(oldPath).catch(() => {
+          log.warn("path does not exist:", path);
+          return;
+        });
+        try {
+          const newPath = path.join(path.dirname(oldPath), newName);
+          await fs.rename(oldPath, newPath);
+        } catch (error) {
+          log.error("rename fail:", error);
+        }
+      }
+    );
+    ipcMain.on(
+      "ask-for-write-file",
+      async (_, filePath: string, content: string | Uint8Array) => {
+        await fs.stat(filePath).catch(() => {
+          log.warn("File does not exist:", filePath);
+          return;
+        });
+        try {
+          const options = typeof content === "string" ? "utf-8" : null;
+          await fs.writeFile(filePath, content, options);
+          log.info(`File saved: ${filePath}`);
+        } catch (error) {
+          log.error("Error writing file:", error);
+        }
+      }
+    );
   }
 }
 

@@ -5,7 +5,7 @@ import styles from "./styles.module.css";
 export type point = { x: number; y: number };
 
 interface ContextMenuProps {
-  pointRef: React.RefObject<point>;
+  event: React.MouseEvent;
   onClose: () => void;
   children: ReactNode;
 }
@@ -35,19 +35,20 @@ export const MenuDivider = () => {
   return <div className={styles.divider} role="separator" />;
 };
 
-const ContextMenu = ({ pointRef, onClose, children }: ContextMenuProps) => {
+const ContextMenu = ({ event, onClose, children }: ContextMenuProps) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!menuRef.current || !pointRef.current) return;
+    if (!menuRef.current) return;
 
     // 给菜单一个小延迟以确保DOM已完全渲染
     const positionTimeout = setTimeout(() => {
-      if (!menuRef.current || !pointRef.current) return;
+      if (!menuRef.current) return;
 
       const menu = menuRef.current;
-      const { x, y } = pointRef.current;
+      const x = event.clientX;
+      const y = event.clientY;
 
       // 获取菜单尺寸和视口尺寸
       const menuRect = menu.getBoundingClientRect();
@@ -74,7 +75,7 @@ const ContextMenu = ({ pointRef, onClose, children }: ContextMenuProps) => {
     }, 0);
 
     return () => clearTimeout(positionTimeout);
-  }, [pointRef.current]);
+  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -167,7 +168,7 @@ const ContextMenu = ({ pointRef, onClose, children }: ContextMenuProps) => {
           if (!React.isValidElement(child)) {
             return child;
           }
-
+          
           if (child.type === MenuItem) {
             const typedChild = child as React.ReactElement<MenuItemProps>;
             return React.cloneElement(typedChild, {
@@ -179,6 +180,7 @@ const ContextMenu = ({ pointRef, onClose, children }: ContextMenuProps) => {
               }
             });
           }
+
 
           return child;
         })}

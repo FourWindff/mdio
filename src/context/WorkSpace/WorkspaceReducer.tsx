@@ -11,14 +11,8 @@ export type WorkspaceAction =
   | { type: "SET_EXPANDED_FOLDERS"; payload: string[] }
   | { type: "SET_EXPANDED_STATUS"; payload: boolean }
   | { type: "SET_SORT_TYPE"; payload: SortType }
-//文件操作(除了FILE_ACTIVE都包括文件夹)
-// | { type: "FILE_CREATE"; payload: FileItem }
-// | { type: "FILES_COPY"; payload: FileItem[] }
-// | { type: "FILES_CUT"; payload: FileItem[] }
-// | { type: "CLEAR_CLIPBOARD" }
-// | { type: "FILE_RENAME"; payload: { file: FileItem; newName: string } }
-// | { type: "FILE_REMOVE"; payload: string }
-// | { type: "FILE_EDITING"; payload: FileItem }
+  | { type: "SET_ACTIVE_ITEM"; payload: FileItem }
+
 export const workspaceReducer = (
   state: WorkspaceState,
   action: WorkspaceAction
@@ -38,6 +32,8 @@ export const workspaceReducer = (
       return { ...state, activeFile: action.payload }
     case "SET_TABS":
       return { ...state, tabs: action.payload }
+    case "SET_ACTIVE_ITEM":
+      return { ...state, activeItem: action.payload }
 
 
     default:

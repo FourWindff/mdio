@@ -11,20 +11,19 @@ var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "
 var _validator, _encryptionKey, _options, _defaultValues;
 import * as path$h from "node:path";
 import path__default, { resolve as resolve$5, join, relative, sep } from "node:path";
-import * as fs$l from "node:fs/promises";
-import fs__default, { lstat, stat as stat$5, readdir, realpath } from "node:fs/promises";
+import fs$o, { lstat, stat as stat$5, readdir, realpath } from "node:fs/promises";
 import electron, { ipcMain as ipcMain$1, nativeTheme, app as app$2, BrowserWindow, dialog } from "electron";
-import fs$o, { realpath as realpath$1, stat as stat$6, lstat as lstat$1, open, readdir as readdir$1 } from "fs/promises";
+import fs$n, { realpath as realpath$1, stat as stat$6, lstat as lstat$1, open, readdir as readdir$1 } from "fs/promises";
 import * as sysPath from "path";
 import sysPath__default from "path";
 import { fileURLToPath } from "node:url";
-import fs$n, { unwatchFile, watchFile, watch as watch$1, stat as stat$7 } from "fs";
+import fs$m, { unwatchFile, watchFile, watch as watch$1, stat as stat$7 } from "fs";
 import require$$0$3, { EventEmitter } from "events";
 import { Readable } from "node:stream";
 import require$$1$1, { type as type$b } from "os";
 import process$1 from "node:process";
 import { promisify, isDeepStrictEqual } from "node:util";
-import fs$m from "node:fs";
+import fs$l from "node:fs";
 import crypto from "node:crypto";
 import assert$1 from "node:assert";
 import os from "node:os";
@@ -1741,7 +1740,7 @@ const addDir = (win, pathname, type2) => {
   ipcMain$1.emit(EVENT_NAME[type2], null, { event: "addDir", pathname, win });
 };
 const unlinkDir = (win, pathname, type2) => {
-  if (type2 === "dir") return;
+  if (type2 === "file") return;
   ipcMain$1.emit(EVENT_NAME[type2], null, { event: "unlinkDir", pathname, win });
 };
 class Watcher {
@@ -1773,6 +1772,7 @@ class Watcher {
       persistent: true,
       ignorePermissionErrors: true,
       depth: type2 === "file" ? isOsx ? 1 : 0 : void 0,
+      //TODO The projectTree will delay to render when file was created first time
       awaitWriteFinish: {
         stabilityThreshold: WATCHER_STABILITY_THRESHOLD,
         pollInterval: WATCHER_STABILITY_POLL_INTERVAL
@@ -2290,44 +2290,44 @@ const retryifySync = (fn, isRetriableError) => {
 const FS = {
   attempt: {
     /* ASYNC */
-    chmod: attemptifyAsync(promisify(fs$m.chmod), Handlers.onChangeError),
-    chown: attemptifyAsync(promisify(fs$m.chown), Handlers.onChangeError),
-    close: attemptifyAsync(promisify(fs$m.close), NOOP),
-    fsync: attemptifyAsync(promisify(fs$m.fsync), NOOP),
-    mkdir: attemptifyAsync(promisify(fs$m.mkdir), NOOP),
-    realpath: attemptifyAsync(promisify(fs$m.realpath), NOOP),
-    stat: attemptifyAsync(promisify(fs$m.stat), NOOP),
-    unlink: attemptifyAsync(promisify(fs$m.unlink), NOOP),
+    chmod: attemptifyAsync(promisify(fs$l.chmod), Handlers.onChangeError),
+    chown: attemptifyAsync(promisify(fs$l.chown), Handlers.onChangeError),
+    close: attemptifyAsync(promisify(fs$l.close), NOOP),
+    fsync: attemptifyAsync(promisify(fs$l.fsync), NOOP),
+    mkdir: attemptifyAsync(promisify(fs$l.mkdir), NOOP),
+    realpath: attemptifyAsync(promisify(fs$l.realpath), NOOP),
+    stat: attemptifyAsync(promisify(fs$l.stat), NOOP),
+    unlink: attemptifyAsync(promisify(fs$l.unlink), NOOP),
     /* SYNC */
-    chmodSync: attemptifySync(fs$m.chmodSync, Handlers.onChangeError),
-    chownSync: attemptifySync(fs$m.chownSync, Handlers.onChangeError),
-    closeSync: attemptifySync(fs$m.closeSync, NOOP),
-    existsSync: attemptifySync(fs$m.existsSync, NOOP),
-    fsyncSync: attemptifySync(fs$m.fsync, NOOP),
-    mkdirSync: attemptifySync(fs$m.mkdirSync, NOOP),
-    realpathSync: attemptifySync(fs$m.realpathSync, NOOP),
-    statSync: attemptifySync(fs$m.statSync, NOOP),
-    unlinkSync: attemptifySync(fs$m.unlinkSync, NOOP)
+    chmodSync: attemptifySync(fs$l.chmodSync, Handlers.onChangeError),
+    chownSync: attemptifySync(fs$l.chownSync, Handlers.onChangeError),
+    closeSync: attemptifySync(fs$l.closeSync, NOOP),
+    existsSync: attemptifySync(fs$l.existsSync, NOOP),
+    fsyncSync: attemptifySync(fs$l.fsync, NOOP),
+    mkdirSync: attemptifySync(fs$l.mkdirSync, NOOP),
+    realpathSync: attemptifySync(fs$l.realpathSync, NOOP),
+    statSync: attemptifySync(fs$l.statSync, NOOP),
+    unlinkSync: attemptifySync(fs$l.unlinkSync, NOOP)
   },
   retry: {
     /* ASYNC */
-    close: retryifyAsync(promisify(fs$m.close), Handlers.isRetriableError),
-    fsync: retryifyAsync(promisify(fs$m.fsync), Handlers.isRetriableError),
-    open: retryifyAsync(promisify(fs$m.open), Handlers.isRetriableError),
-    readFile: retryifyAsync(promisify(fs$m.readFile), Handlers.isRetriableError),
-    rename: retryifyAsync(promisify(fs$m.rename), Handlers.isRetriableError),
-    stat: retryifyAsync(promisify(fs$m.stat), Handlers.isRetriableError),
-    write: retryifyAsync(promisify(fs$m.write), Handlers.isRetriableError),
-    writeFile: retryifyAsync(promisify(fs$m.writeFile), Handlers.isRetriableError),
+    close: retryifyAsync(promisify(fs$l.close), Handlers.isRetriableError),
+    fsync: retryifyAsync(promisify(fs$l.fsync), Handlers.isRetriableError),
+    open: retryifyAsync(promisify(fs$l.open), Handlers.isRetriableError),
+    readFile: retryifyAsync(promisify(fs$l.readFile), Handlers.isRetriableError),
+    rename: retryifyAsync(promisify(fs$l.rename), Handlers.isRetriableError),
+    stat: retryifyAsync(promisify(fs$l.stat), Handlers.isRetriableError),
+    write: retryifyAsync(promisify(fs$l.write), Handlers.isRetriableError),
+    writeFile: retryifyAsync(promisify(fs$l.writeFile), Handlers.isRetriableError),
     /* SYNC */
-    closeSync: retryifySync(fs$m.closeSync, Handlers.isRetriableError),
-    fsyncSync: retryifySync(fs$m.fsyncSync, Handlers.isRetriableError),
-    openSync: retryifySync(fs$m.openSync, Handlers.isRetriableError),
-    readFileSync: retryifySync(fs$m.readFileSync, Handlers.isRetriableError),
-    renameSync: retryifySync(fs$m.renameSync, Handlers.isRetriableError),
-    statSync: retryifySync(fs$m.statSync, Handlers.isRetriableError),
-    writeSync: retryifySync(fs$m.writeSync, Handlers.isRetriableError),
-    writeFileSync: retryifySync(fs$m.writeFileSync, Handlers.isRetriableError)
+    closeSync: retryifySync(fs$l.closeSync, Handlers.isRetriableError),
+    fsyncSync: retryifySync(fs$l.fsyncSync, Handlers.isRetriableError),
+    openSync: retryifySync(fs$l.openSync, Handlers.isRetriableError),
+    readFileSync: retryifySync(fs$l.readFileSync, Handlers.isRetriableError),
+    renameSync: retryifySync(fs$l.renameSync, Handlers.isRetriableError),
+    statSync: retryifySync(fs$l.statSync, Handlers.isRetriableError),
+    writeSync: retryifySync(fs$l.writeSync, Handlers.isRetriableError),
+    writeFileSync: retryifySync(fs$l.writeFileSync, Handlers.isRetriableError)
   }
 };
 const DEFAULT_ENCODING = "utf8";
@@ -16907,7 +16907,7 @@ class Conf {
   }
   get store() {
     try {
-      const data = fs$m.readFileSync(this.path, __privateGet(this, _encryptionKey) ? null : "utf8");
+      const data = fs$l.readFileSync(this.path, __privateGet(this, _encryptionKey) ? null : "utf8");
       const dataString = this._encryptData(data);
       const deserializedData = this._deserialize(dataString);
       this._validate(deserializedData);
@@ -16977,7 +16977,7 @@ class Conf {
     throw new Error("Config schema violation: " + errors2.join("; "));
   }
   _ensureDirectory() {
-    fs$m.mkdirSync(path__default.dirname(this.path), { recursive: true });
+    fs$l.mkdirSync(path__default.dirname(this.path), { recursive: true });
   }
   _write(value) {
     let data = this._serialize(value);
@@ -16988,13 +16988,13 @@ class Conf {
       data = concatUint8Arrays([initializationVector, stringToUint8Array(":"), cipher.update(stringToUint8Array(data)), cipher.final()]);
     }
     if (process$1.env.SNAP) {
-      fs$m.writeFileSync(this.path, data, { mode: __privateGet(this, _options).configFileMode });
+      fs$l.writeFileSync(this.path, data, { mode: __privateGet(this, _options).configFileMode });
     } else {
       try {
         writeFileSync$1(this.path, data, { mode: __privateGet(this, _options).configFileMode });
       } catch (error2) {
         if ((error2 == null ? void 0 : error2.code) === "EXDEV") {
-          fs$m.writeFileSync(this.path, data, { mode: __privateGet(this, _options).configFileMode });
+          fs$l.writeFileSync(this.path, data, { mode: __privateGet(this, _options).configFileMode });
           return;
         }
         throw error2;
@@ -17003,15 +17003,15 @@ class Conf {
   }
   _watch() {
     this._ensureDirectory();
-    if (!fs$m.existsSync(this.path)) {
+    if (!fs$l.existsSync(this.path)) {
       this._write(createPlainObject());
     }
     if (process$1.platform === "win32") {
-      fs$m.watch(this.path, { persistent: false }, debounceFunction(() => {
+      fs$l.watch(this.path, { persistent: false }, debounceFunction(() => {
         this.events.dispatchEvent(new Event("change"));
       }, { wait: 100 }));
     } else {
-      fs$m.watchFile(this.path, { persistent: false }, debounceFunction(() => {
+      fs$l.watchFile(this.path, { persistent: false }, debounceFunction(() => {
         this.events.dispatchEvent(new Event("change"));
       }, { wait: 5e3 }));
     }
@@ -17903,7 +17903,7 @@ var hasRequiredPackageJson;
 function requirePackageJson() {
   if (hasRequiredPackageJson) return packageJson;
   hasRequiredPackageJson = 1;
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   const path2 = sysPath__default;
   packageJson = {
     findAndReadPackageJson,
@@ -18342,7 +18342,7 @@ var hasRequiredInitialize;
 function requireInitialize() {
   if (hasRequiredInitialize) return initialize;
   hasRequiredInitialize = 1;
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   const os2 = require$$1$1;
   const path2 = sysPath__default;
   const preloadInitializeFn = requireElectronLogPreload();
@@ -19143,7 +19143,7 @@ function requireFile$1() {
   if (hasRequiredFile$1) return File_1;
   hasRequiredFile$1 = 1;
   const EventEmitter2 = require$$0$3;
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   const os2 = require$$1$1;
   class File extends EventEmitter2 {
     constructor({
@@ -19302,7 +19302,7 @@ function requireFileRegistry() {
   if (hasRequiredFileRegistry) return FileRegistry_1;
   hasRequiredFileRegistry = 1;
   const EventEmitter2 = require$$0$3;
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   const path2 = sysPath__default;
   const File = requireFile$1();
   const NullFile = requireNullFile();
@@ -19372,7 +19372,7 @@ var hasRequiredFile;
 function requireFile() {
   if (hasRequiredFile) return file$2;
   hasRequiredFile = 1;
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   const os2 = require$$1$1;
   const path2 = sysPath__default;
   const FileRegistry = requireFileRegistry();
@@ -19793,150 +19793,6 @@ const DEFAULT_WORKSPACE = Object.freeze({
   sortBy: SortType.ALPHABETICAL_ASC,
   isExpandedAll: false
 });
-const READ_DIRECTORY = "read_directory";
-const CREATE_DIRECTORY = "create_directory";
-const UNLINK_DIRECTORY = "unlink_directory";
-const RENAME_DIRECTORY = "rename_directory";
-const WRITE_FILE = "write_file";
-const CREATE_FILE = "create_file";
-const UNLINK_FILE = "unlink_file";
-const RENAME_FILE = "rename_file";
-ipcMain$1.handle(READ_DIRECTORY, async (_, dirPath) => {
-  try {
-    const getChild = async (dirPath2) => {
-      const items2 = await fs$l.readdir(dirPath2, { withFileTypes: true });
-      const filePromises = items2.filter((item) => {
-        if (item.isDirectory()) {
-          return true;
-        }
-        const extension = path$h.extname(item.name).toLowerCase();
-        return LEGAL_TYPE.includes(extension);
-      }).map(async (item) => {
-        const filePath = path$h.join(dirPath2, item.name);
-        const children = item.isDirectory() ? await getChild(filePath) : void 0;
-        return {
-          basename: path$h.basename(filePath),
-          name: getFilenameWithoutExt(filePath),
-          extension: path$h.extname(filePath).toLowerCase(),
-          path: filePath,
-          isFile: item.isFile(),
-          isDirectory: item.isDirectory(),
-          children
-        };
-      });
-      return Promise.all(filePromises);
-    };
-    return getChild(dirPath);
-  } catch (error2) {
-    console.error("Error reading directory:", error2);
-    return [];
-  }
-});
-ipcMain$1.handle(
-  CREATE_DIRECTORY,
-  async (_, dirPath, folderName) => {
-    try {
-      const folderPath = path$h.join(dirPath, folderName);
-      await fs$l.mkdir(folderPath);
-      const stat2 = await fs$l.stat(folderPath);
-      const folderItem = {
-        basename: path$h.basename(folderName),
-        name: getFilenameWithoutExt(folderPath),
-        extension: path$h.extname(folderName).toLowerCase(),
-        path: folderPath,
-        isFile: false,
-        isDirectory: true,
-        createTime: stat2.birthtimeMs,
-        lastModifiedTime: stat2.mtimeMs
-      };
-      return folderItem;
-    } catch (error2) {
-      console.error("Error create directory:", error2);
-      return null;
-    }
-  }
-);
-ipcMain$1.handle(UNLINK_DIRECTORY, async (_, dirPath) => {
-  try {
-    const stats = await fs$l.stat(dirPath);
-    if (stats.isDirectory()) {
-      await fs$l.rm(dirPath, { recursive: true, force: true });
-      return dirPath;
-    }
-  } catch (error2) {
-    console.error("删除文件夹失败:", error2);
-  }
-});
-ipcMain$1.handle(
-  RENAME_DIRECTORY,
-  async (_, oldPath, newName) => {
-    try {
-      const newPath = path$h.join(path$h.dirname(oldPath), newName);
-      await fs$l.rename(oldPath, newPath);
-      return newPath;
-    } catch (error2) {
-      console.error("重命名失败:", error2);
-      return null;
-    }
-  }
-);
-ipcMain$1.handle(CREATE_FILE, async (_, { dirPath, fileName }) => {
-  try {
-    const filePath = path$h.join(dirPath, fileName);
-    await fs$l.writeFile(filePath, "");
-    const stat2 = await fs$l.stat(filePath);
-    const fileItem = {
-      basename: path$h.basename(fileName),
-      name: getFilenameWithoutExt(fileName),
-      extension: path$h.extname(fileName).toLowerCase(),
-      path: filePath,
-      isFile: true,
-      isDirectory: false,
-      createTime: stat2.birthtimeMs,
-      lastModifiedTime: stat2.mtimeMs
-    };
-    return fileItem;
-  } catch (error2) {
-    console.error("创建文件失败:", error2);
-    return null;
-  }
-});
-ipcMain$1.handle(
-  WRITE_FILE,
-  async (_, filePath, content2) => {
-    try {
-      const dir = path$h.dirname(filePath);
-      await fs$l.mkdir(dir, { recursive: true });
-      const options = typeof content2 === "string" ? "utf-8" : null;
-      await fs$l.writeFile(filePath, content2, options);
-      console.log(`${Date.now().toString()} - File saved: ${filePath}`);
-      return filePath;
-    } catch (error2) {
-      console.error("Error writing file:", error2);
-    }
-  }
-);
-ipcMain$1.handle(RENAME_FILE, async (_, oldPath, newName) => {
-  try {
-    const newPath = path$h.join(path$h.dirname(oldPath), newName);
-    await fs$l.rename(oldPath, newPath);
-    return newPath;
-  } catch (error2) {
-    console.error("重命名失败:", error2);
-    return null;
-  }
-});
-ipcMain$1.handle(UNLINK_FILE, async (_, filePath) => {
-  try {
-    const stats = await fs$l.stat(filePath);
-    if (stats.isFile()) {
-      await fs$l.unlink(filePath);
-      return filePath;
-    }
-  } catch (error2) {
-    console.error("删除文件失败:", error2);
-  }
-});
 function getFilenameWithoutExt(filePath) {
   const basename = path$h.basename(filePath);
   const extension = path$h.extname(basename);
@@ -19948,7 +19804,7 @@ const log = /* @__PURE__ */ getDefaultExportFromCjs(node_1);
 class Tree {
   constructor(rootPath) {
     __publicField(this, "root");
-    const stat2 = fs$n.statSync(rootPath);
+    const stat2 = fs$m.statSync(rootPath);
     if (stat2.isFile()) throw new Error("workspaceDir should be a directory");
     this.root = {
       basename: sysPath__default.basename(rootPath),
@@ -19976,7 +19832,7 @@ class Tree {
     log.info("tree-addFile:", pathname);
     const dirname = sysPath__default.dirname(pathname);
     const name = getFilenameWithoutExt(pathname);
-    const stat2 = fs$n.statSync(pathname);
+    const stat2 = fs$m.statSync(pathname);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
     let currentPath = this.root.path;
     let currentFolder = this.root;
@@ -20021,7 +19877,7 @@ class Tree {
   addDir(dirname) {
     log.info("tree-addDir:", dirname);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
-    const stat2 = fs$n.statSync(dirname);
+    const stat2 = fs$m.statSync(dirname);
     let currentPath = this.root.path;
     let currentSubFolders = this.root.folders;
     for (const directoryName of subDirectories) {
@@ -20533,7 +20389,7 @@ function clone$1(obj) {
   });
   return copy2;
 }
-var fs$j = fs$n;
+var fs$j = fs$m;
 var polyfills = polyfills$1;
 var legacy = legacyStreams;
 var clone = clone_1;
@@ -22158,7 +22014,7 @@ var _fs;
 try {
   _fs = gracefulFs;
 } catch (_) {
-  _fs = fs$n;
+  _fs = fs$m;
 }
 function readFile(file2, options, callback) {
   if (callback == null) {
@@ -22466,7 +22322,7 @@ var output = {
     pathExists_1,
     remove$2
   );
-  const fs2 = fs$n;
+  const fs2 = fs$m;
   if (Object.getOwnPropertyDescriptor(fs2, "promises")) {
     Object.defineProperty(module.exports, "promises", {
       get() {
@@ -22513,8 +22369,8 @@ class Workspace {
     }
     const activeFile = this.get("activeFile");
     let activeFileItem = null;
-    if (activeFile && fs$n.existsSync(activeFile)) {
-      const stat2 = fs$n.statSync(activeFile);
+    if (activeFile && fs$m.existsSync(activeFile)) {
+      const stat2 = fs$m.statSync(activeFile);
       activeFileItem = {
         basename: sysPath__default.basename(activeFile),
         name: getFilenameWithoutExt(activeFile),
@@ -22714,6 +22570,33 @@ class Workspace {
     });
   }
 }
+process.platform === "darwin";
+const LEXICAL_EXTENSIONS = Object.freeze(["lexical"]);
+Object.freeze(
+  LEXICAL_EXTENSIONS.map((x) => "*." + x)
+);
+const getUniquenName = (dirPath, filename) => {
+  if (!fs$m.existsSync(dirPath)) {
+    throw new Error(`Directory doesn't exist: ${dirPath}`);
+  }
+  const existingFiles = fs$m.readdirSync(dirPath);
+  if (!existingFiles.includes(filename)) {
+    return filename;
+  }
+  const ext = sysPath__default.extname(filename);
+  const baseName = ext ? filename.slice(0, -ext.length) : filename;
+  let counter = 1;
+  let newFilename;
+  do {
+    if (ext) {
+      newFilename = `${baseName}(${counter})${ext}`;
+    } else {
+      newFilename = `${baseName}(${counter})`;
+    }
+    counter++;
+  } while (existingFiles.includes(newFilename));
+  return newFilename;
+};
 const __dirname$1 = sysPath__default.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = sysPath__default.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -22848,13 +22731,13 @@ class App {
       try {
         const extension = sysPath__default.extname(filePath).toLowerCase();
         if (IMAGE_TYPE.includes(extension)) {
-          const buffer2 = await fs$o.readFile(filePath);
+          const buffer2 = await fs$n.readFile(filePath);
           return buffer2.toString("base64");
         } else if (TEXT_TYPE.includes(extension)) {
-          const buffer2 = await fs$o.readFile(filePath);
+          const buffer2 = await fs$n.readFile(filePath);
           return buffer2.toString("utf-8");
         } else {
-          const buffer2 = await fs$o.readFile(filePath);
+          const buffer2 = await fs$n.readFile(filePath);
           return new Uint8Array(buffer2);
         }
       } catch (error2) {
@@ -22862,12 +22745,96 @@ class App {
         throw error2;
       }
     });
+    ipcMain$1.on(
+      "ask-for-create-directory",
+      async (_, parentPath, dirname) => {
+        const uniqueName = getUniquenName(parentPath, dirname);
+        const dirPath = sysPath__default.join(parentPath, uniqueName);
+        const stat2 = await fs$n.stat(dirPath).catch(() => false);
+        if (stat2) {
+          log$1.warn("Directory already exists:", dirPath);
+          return;
+        }
+        try {
+          await fs$n.mkdir(dirPath, { recursive: true });
+          log$1.info("Create new file", dirPath);
+        } catch (error2) {
+          log$1.error("Error creating directory:", error2);
+        }
+      }
+    );
+    ipcMain$1.on(
+      "ask-for-create-file",
+      async (_, parentPath, filename) => {
+        const uniqueName = getUniquenName(parentPath, filename);
+        const filePath = sysPath__default.join(parentPath, uniqueName);
+        const stat2 = await fs$n.stat(filePath).catch(() => false);
+        if (stat2) {
+          log$1.warn("File already exists:", filePath);
+          return;
+        }
+        try {
+          await fs$n.writeFile(filePath, "");
+          log$1.info("Create new file", filePath);
+        } catch (error2) {
+          log$1.error("Error create file:", error2);
+        }
+      }
+    );
+    ipcMain$1.on("ask-for-unlink", async (_, path2) => {
+      await fs$n.stat(path2).catch(() => {
+        log$1.warn("file does not exist:", path2);
+        return;
+      });
+      try {
+        const stats = await fs$n.stat(path2);
+        if (stats.isFile()) {
+          await fs$n.unlink(path2);
+        }
+        if (stats.isDirectory()) {
+          await fs$n.rm(path2, { recursive: true, force: true });
+        }
+      } catch (error2) {
+        log$1.error("Unlink fail:", error2);
+      }
+    });
+    ipcMain$1.on(
+      "ask-for-rename",
+      async (_, oldPath, newName) => {
+        await fs$n.stat(oldPath).catch(() => {
+          log$1.warn("path does not exist:", sysPath__default);
+          return;
+        });
+        try {
+          const newPath = sysPath__default.join(sysPath__default.dirname(oldPath), newName);
+          await fs$n.rename(oldPath, newPath);
+        } catch (error2) {
+          log$1.error("rename fail:", error2);
+        }
+      }
+    );
+    ipcMain$1.on(
+      "ask-for-write-file",
+      async (_, filePath, content2) => {
+        await fs$n.stat(filePath).catch(() => {
+          log$1.warn("File does not exist:", filePath);
+          return;
+        });
+        try {
+          const options = typeof content2 === "string" ? "utf-8" : null;
+          await fs$n.writeFile(filePath, content2, options);
+          log$1.info(`File saved: ${filePath}`);
+        } catch (error2) {
+          log$1.error("Error writing file:", error2);
+        }
+      }
+    );
   }
 }
 const require$1 = createRequire(import.meta.url);
 const pdfjsDistPath = path__default.dirname(require$1.resolve("pdfjs-dist/package.json"));
 const pdfWorkerPath = path__default.join(pdfjsDistPath, "build", "pdf.worker.min.mjs");
-fs__default.cp(pdfWorkerPath, "src/lib/pdfjs-dist/pdf.worker.min.mjs", {
+fs$o.cp(pdfWorkerPath, "src/lib/pdfjs-dist/pdf.worker.min.mjs", {
   recursive: true
 });
 const app = new App();

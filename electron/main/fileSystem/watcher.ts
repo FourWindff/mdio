@@ -3,7 +3,6 @@ import { getUniqueId } from "../util";
 import chokidar from "chokidar";
 
 import { isOsx } from "../config";
-import { hasLexicalExtension } from "../../common/filesystem/paths";
 import { Preference } from "../preference";
 
 interface ChangeEvent {
@@ -39,7 +38,7 @@ const addDir = (win: BrowserWindow, pathname: string, type: WatchType) => {
   ipcMain.emit(EVENT_NAME[type], null, { event: "addDir", pathname, win });
 };
 const unlinkDir = (win: BrowserWindow, pathname: string, type: WatchType) => {
-  if (type === "dir") return;
+  if (type === "file") return;
   ipcMain.emit(EVENT_NAME[type], null, { event: "unlinkDir", pathname, win });
 };
 export class Watcher {
@@ -73,6 +72,7 @@ export class Watcher {
       persistent: true,
       ignorePermissionErrors: true,
       depth: type === "file" ? (isOsx ? 1 : 0) : undefined,
+      //TODO The projectTree will delay to render when file was created first time
       awaitWriteFinish: {
         stabilityThreshold: WATCHER_STABILITY_THRESHOLD,
         pollInterval: WATCHER_STABILITY_POLL_INTERVAL,

@@ -10,6 +10,8 @@ import { FileItem } from "@/types/types";
 import { ActivityTypes } from "@/context/AppState/AppStateContext";
 import WorkSpaceProvider from "@/context/WorkSpace/WorkspaceProvider";
 import { useWorkspace } from "@/context/WorkSpace/WorkspaceContext";
+import useModal from "@/features/editor/hooks/useModal";
+import { Settings } from "@/components/ui/Settings";
 
 
 type Side = "left" | "right";
@@ -169,6 +171,7 @@ const ActivityBar = ({
   onToggleLeft: () => void;
   onActivityChange: (activityType: ActivityTypes) => void;
 }) => {
+  const [modal,showModal]=useModal();
   return (
     <div className="activity-bar">
       <div className="activity-bar-buttons">
@@ -194,13 +197,15 @@ const ActivityBar = ({
           className={`activity-button ${activity === "settings" ? "active" : ""
             }`}
           onClick={() => {
-            onActivityChange("settings");
-            window.electron.store.clear();
+            showModal("Settings",(onClose)=>(
+              <Settings onClose={onClose}/>
+            ))
           }}
         >
           <i className="icon setting" />
         </button>
       </div>
+      {modal}
     </div>
   );
 };

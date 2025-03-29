@@ -1884,4 +1884,7 @@ i.file-paste{
 i.file-move{
   background-image: url(assets/images/app-icons/file-move.svg);
 }
+i.file-cut{
+  background-image: url(assets/images/app-icons/file-cut.svg);
+}
 

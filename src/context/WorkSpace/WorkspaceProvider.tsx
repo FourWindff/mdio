@@ -45,18 +45,20 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
   }, []);
 
   const handleActiveFile = useCallback((filePath: string) => {
+    if(filePath===state.activeFile?.path) return ;
     window.ipcRenderer.invoke("active-file", filePath).then(({ activeFile, tabs }) => {
       console.log("当前选中的文件以及标签页:", activeFile, tabs);
       dispatch({ type: "SET_ACTIVE_FILE", payload: activeFile });
       dispatch({ type: "SET_TABS", payload: tabs });
     })
-  }, []);
+  }, [state.activeFile?.path]);
   const handleActiveTab = useCallback((filePath: string) => {
+    if(filePath===state.activeFile?.path) return ;
     window.ipcRenderer.invoke("active-tab", filePath).then(({ activeFile }) => {
       console.log("当前选中的文件以及标签页:", activeFile);
       dispatch({ type: "SET_ACTIVE_FILE", payload: activeFile });
     })
-  }, [])
+  }, [state.activeFile?.path])
   const handleCloseTab = useCallback((filePath: string) => {
     window.ipcRenderer.invoke("close-tab", filePath).then(({ activeFile, tabs }) => {
       console.log("当前选中的文件以及标签页:", activeFile, tabs);
@@ -71,7 +73,6 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
       dispatch({ type: "SET_TABS", payload: tabs });
     })
   }, []);
-
   const handleToggleExpand = useCallback((item: FileItem) => {
     if (item.isFile) return;
     window.ipcRenderer.invoke("toggle-expand", item.path).then(({ expandedFolders, isExpandedAll }) => {
@@ -88,15 +89,16 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
     })
   }, []);
 
-
-
   const handleOpenDirectory = useCallback(() => {
     window.ipcRenderer.invoke("ask-for-open-directory").then((path) => {
       if (!path) return;
       dispatch({ type: "SET_WORK_PATH", payload: path });
     })
-  }, [])
+  }, []);
 
+  const handleActiveItem=useCallback((item:FileItem)=>{
+    dispatch({type:"SET_ACTIVE_ITEM",payload:item});
+  },[])
 
 
   const handleCreateFile = useCallback(() => {
@@ -120,7 +122,8 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
     handleToggleExpandAll,
     handleOpenDirectory,
     handleCreateFile,
-    handleCreateFolder
+    handleCreateFolder,
+    handleActiveItem,
   };
 
   return (
@@ -129,30 +132,3 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
     </WorkspaceContext.Provider>
   );
 }
-
-
-
-
-const getUniquenName = (
-  baseName: string,
-  existingFiles: FileItem[],
-  extension?: string
-) => {
-  let counter = 1;
-  let newName = extension ? `${baseName}${extension}` : baseName;
-
-  // 检查是否已存在该文件名
-  while (
-    existingFiles.some(
-      (file) => file.path.toLowerCase() === newName.toLowerCase()
-    )
-  ) {
-    if (extension) {
-      newName = `${baseName}(${counter})${extension}`;
-    } else {
-      newName = `${baseName} (${counter})`;
-    }
-    counter++;
-  }
-  return newName;
-};

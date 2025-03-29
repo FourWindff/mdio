@@ -9,12 +9,13 @@ export interface WorkspaceState {
   activeFile: FileItem | null;
   expandedFolders: string[];
   isExpandedAll:boolean;
-  editingFile: FileItem | null;
+  sortType: SortType;
+  //以下状态无需通过保存
   clipboard: {
     items: FileItem[];
     operation: "copy" | "cut" | null;
   };
-  sortType: SortType;
+  activeItem: FileItem | null;
 }
 export const initialWorkspaceState: WorkspaceState = {
   workPath: null,
@@ -23,12 +24,12 @@ export const initialWorkspaceState: WorkspaceState = {
   activeFile: null,
   expandedFolders: [],
   isExpandedAll:false,
-  editingFile: null,
+  sortType: SortType.ALPHABETICAL_ASC,
   clipboard: {
     items: [],
     operation: null,
   },
-  sortType: SortType.ALPHABETICAL_ASC,
+  activeItem: null,
 };
 
 export interface WorkspaceContextShape {
@@ -42,6 +43,7 @@ export interface WorkspaceContextShape {
   handleOpenDirectory: () => void;
   handleCreateFile: () => void;
   handleCreateFolder: () => void;
+  handleActiveItem:(item: FileItem) => void;
 }
 export const WorkspaceContext = createContext<
   WorkspaceContextShape | undefined
