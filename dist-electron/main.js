@@ -1715,7 +1715,7 @@ const chokidar = { watch, FSWatcher };
 const isOsx = process.platform === "darwin";
 process.platform === "win32";
 process.platform === "linux";
-const WATCHER_STABILITY_THRESHOLD = 1e3;
+const WATCHER_STABILITY_THRESHOLD = 200;
 const WATCHER_STABILITY_POLL_INTERVAL = 150;
 const EVENT_NAME = {
   dir: "WATCHER_DIR_EVENT",
@@ -1763,7 +1763,7 @@ class Watcher {
         if (/(?:^|[/\\])(?:\..|node_modules|(?:.+\.asar))/.test(pathname)) {
           return true;
         }
-        if (fileInfo.isDirectory()) {
+        if (fileInfo.isDirectory() || path__default.basename(pathname).startsWith("New File")) {
           return false;
         }
         return false;
@@ -19902,6 +19902,7 @@ class Tree {
     }
   }
   unlinkFile(filepath) {
+    log.info("tree-unlinkFile:", filepath);
     const dirname = sysPath__default.dirname(filepath);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
     let currentFolder = this.root;
@@ -19922,6 +19923,7 @@ class Tree {
     }
   }
   unlinkDir(dirpath) {
+    log.info("tree-unlinkDir:", dirpath);
     const subDirectories = this.getSubdirectoriesFromRoot(dirpath);
     subDirectories.pop();
     let currentSubFolders = this.root.folders;
@@ -19975,6 +19977,9 @@ class Tree {
       };
     };
     return clone2(this.root);
+  }
+  getTree() {
+    return this.root;
   }
 }
 var lib = { exports: {} };
@@ -22348,9 +22353,11 @@ class Workspace {
     __publicField(this, "workspaceDir");
     __publicField(this, "projectTree");
     __publicField(this, "folderCount");
+    __publicField(this, "win");
     this.workspaceDir = workspaceDir;
     this.projectTree = new Tree(workspaceDir);
     this.folderCount = 0;
+    this.win = win;
     this.store = new ElectronStore({
       name: CONFIG_NAME,
       cwd: sysPath__default.join(workspaceDir, CONFIG_DIR),
@@ -22397,6 +22404,11 @@ class Workspace {
   getWorkspaceDir() {
     return this.workspaceDir;
   }
+  setActiveFile(filePath) {
+    if (filePath === this.get("activeFile")) return;
+    this.addTab(filePath);
+    this.set("activeFile", filePath);
+  }
   getActiveFileItem() {
     const activeFile = this.get("activeFile");
     if (activeFile) {
@@ -22407,10 +22419,13 @@ class Workspace {
   getExpandedFolders() {
     return this.get("expandedFolders");
   }
-  setActiveFile(filePath) {
-    if (filePath === this.get("activeFile")) return;
-    this.addTab(filePath);
-    this.set("activeFile", filePath);
+  removeExpandIfExist(pathname) {
+    const expandedFolders = this.getExpandedFolders();
+    const idx = expandedFolders.indexOf(pathname);
+    if (idx !== -1) {
+      expandedFolders.splice(idx, 1);
+      this.set("expandedFolders", expandedFolders);
+    }
   }
   toggleExpand(filePath) {
     const expandedFolders = this.getExpandedFolders();
@@ -22505,6 +22520,9 @@ class Workspace {
         }
         case "unlink": {
           this.projectTree.unlinkFile(pathname);
+          if (this.get("tabs").some((t2) => t2.path === pathname)) {
+            this.closeTab(pathname);
+          }
           break;
         }
         case "addDir": {
@@ -22515,13 +22533,21 @@ class Workspace {
         case "unlinkDir": {
           this.folderCount--;
           this.projectTree.unlinkDir(pathname);
+          this.removeExpandIfExist(pathname);
           break;
         }
         default: {
           throw new Error(`Unknown event: ${event}`);
         }
       }
-      win == null ? void 0 : win.webContents.send("UPDATE_PROJECT_TREE", this.projectTree.clone());
+      const update = {
+        tree: this.projectTree.getTree(),
+        activeFile: this.getActiveFileItem(),
+        tabs: this.getTabs(),
+        expandedFolders: this.getExpandedFolders(),
+        isExpandedAll: this.isExpandedAll()
+      };
+      win == null ? void 0 : win.webContents.send("UPDATE_WORKSPACE", update);
     });
   }
   listenForRenderer() {
@@ -22782,8 +22808,8 @@ class App {
       }
     );
     ipcMain$1.on("ask-for-unlink", async (_, path2) => {
-      await fs$n.stat(path2).catch(() => {
-        log$1.warn("file does not exist:", path2);
+      await fs$n.stat(path2).catch((err) => {
+        log$1.warn(err);
         return;
       });
       try {
@@ -22801,8 +22827,8 @@ class App {
     ipcMain$1.on(
       "ask-for-rename",
       async (_, oldPath, newName) => {
-        await fs$n.stat(oldPath).catch(() => {
-          log$1.warn("path does not exist:", sysPath__default);
+        await fs$n.stat(oldPath).catch((err) => {
+          log$1.warn(err);
           return;
         });
         try {
@@ -22816,8 +22842,8 @@ class App {
     ipcMain$1.on(
       "ask-for-write-file",
       async (_, filePath, content2) => {
-        await fs$n.stat(filePath).catch(() => {
-          log$1.warn("File does not exist:", filePath);
+        await fs$n.stat(filePath).catch((err) => {
+          log$1.warn(err);
           return;
         });
         try {

@@ -1,6 +1,7 @@
 import { FileItem, Tab } from "@/types/types";
-import { createContext, useContext } from "react";
+import { createContext, Dispatch, useContext } from "react";
 import { SortType } from "@electron/common/types";
+import { WorkspaceAction } from "./WorkspaceReducer";
 
 export interface WorkspaceState {
   workPath: string | null;
@@ -15,7 +16,9 @@ export interface WorkspaceState {
     items: FileItem[];
     operation: "copy" | "cut" | null;
   };
-  activeItem: FileItem | null;
+  renameCache:string| null;
+  pasteCache:FileItem[];
+  
 }
 export const initialWorkspaceState: WorkspaceState = {
   workPath: null,
@@ -29,11 +32,13 @@ export const initialWorkspaceState: WorkspaceState = {
     items: [],
     operation: null,
   },
-  activeItem: null,
+  renameCache:null,
+  pasteCache:[]
 };
 
 export interface WorkspaceContextShape {
   state: WorkspaceState;
+  dispatch:Dispatch<WorkspaceAction>
   handleActiveFile: (filePath: string) => void;
   handleActiveTab: (filePath: string) => void;
   handleCloseTab: (filePath: string) => void;

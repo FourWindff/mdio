@@ -205,8 +205,8 @@ class App {
       }
     );
     ipcMain.on("ask-for-unlink", async (_, path: string) => {
-      await fs.stat(path).catch(() => {
-        log.warn("file does not exist:", path);
+      await fs.stat(path).catch((err) => {
+        log.warn(err);
         return;
       });
       try {
@@ -225,8 +225,8 @@ class App {
     ipcMain.on(
       "ask-for-rename",
       async (_, oldPath: string, newName: string) => {
-        await fs.stat(oldPath).catch(() => {
-          log.warn("path does not exist:", path);
+        await fs.stat(oldPath).catch((err) => {
+          log.warn(err);
           return;
         });
         try {
@@ -240,8 +240,8 @@ class App {
     ipcMain.on(
       "ask-for-write-file",
       async (_, filePath: string, content: string | Uint8Array) => {
-        await fs.stat(filePath).catch(() => {
-          log.warn("File does not exist:", filePath);
+        await fs.stat(filePath).catch((err) => {
+          log.warn(err);
           return;
         });
         try {

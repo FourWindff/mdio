@@ -4,6 +4,7 @@ import ContextMenu, { MenuItem } from "..";
 import Button from "../../Button";
 import { DialogActions } from "../../Dialog/Dialog";
 import { newDirectory, newFile, remove } from "./action";
+import { useWorkspace } from "@/context/WorkSpace/WorkspaceContext";
 
 interface props {
   onClose: () => void;
@@ -12,11 +13,11 @@ interface props {
   hasPasteCache: boolean;
   showModal: (title: string, content: (closeModal: () => void) => ReactNode) => void;
 }
-const NEW_FILE = "New File.lexical";
-const NEW_DIRECTORY = "New Directory";
+export const NEW_FILE = "New File.lexical";
+export const NEW_DIRECTORY = "New Directory";
 
 export default function SidebarContextMenu({ event, onClose, item, hasPasteCache, showModal }: props) {
-
+  const { dispatch } = useWorkspace()
   return (
     <ContextMenu
       onClose={onClose}
@@ -35,7 +36,10 @@ export default function SidebarContextMenu({ event, onClose, item, hasPasteCache
           iconClassName="folder-plus" />
       }
       <MenuItem
-        onClick={() => alert("copy")}
+        onClick={()=>{
+          dispatch({type:"SET_PASTE_CACHE",payload:[item]})
+          console.log("copy",[item])
+        }}
         title="Copy"
         iconClassName="file-copy" />
       {hasPasteCache &&
@@ -44,11 +48,17 @@ export default function SidebarContextMenu({ event, onClose, item, hasPasteCache
           title="paste"
           iconClassName="file-paste" />}
       <MenuItem
-        onClick={() => alert("cut")}
+        onClick={()=>{
+          dispatch({type:"SET_PASTE_CACHE",payload:[item]})
+          console.log("cut",item)
+        }}
         title="Cut"
         iconClassName="file-cut" />
       <MenuItem
-        onClick={() => alert("rename")}
+        onClick={() => {
+          dispatch({ type: "SET_RENAME_CACHE", payload: item.path })
+          console.log("rename", item.path)
+        }}
         title="Rename"
         iconClassName="file-rename" />
 
@@ -77,10 +87,6 @@ export default function SidebarContextMenu({ event, onClose, item, hasPasteCache
       <MenuItem
         onClick={() => alert(item.path)}
         title="文件路径"
-        iconClassName="file-rename" />
-      <MenuItem
-        onClick={() => console.log(1)}
-        title="空"
         iconClassName="file-rename" />
 
     </ContextMenu>

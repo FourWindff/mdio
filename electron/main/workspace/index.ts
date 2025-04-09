@@ -8,6 +8,7 @@ import log from "electron-log";
 import { isFile } from "../../common/filesystem";
 import fs from "fs";
 import { getFilenameWithoutExt } from "../fileSystem";
+import { act } from "react";
 const CONFIG_DIR = ".lexical";
 const CONFIG_NAME = "workspace";
 
@@ -16,11 +17,13 @@ export class Workspace {
   private workspaceDir: string;
   private projectTree: Tree;
   private folderCount: number;
+  private win: BrowserWindow;
 
   constructor(win: BrowserWindow, workspaceDir: string) {
     this.workspaceDir = workspaceDir;
     this.projectTree = new Tree(workspaceDir);
     this.folderCount = 0;
+    this.win = win;
     this.store = new Store({
       name: CONFIG_NAME,
       cwd: path.join(workspaceDir, CONFIG_DIR),
@@ -38,7 +41,7 @@ export class Workspace {
         this.set(key, DEFAULT_WORKSPACE[key]);
       }
     }
-    //通知渲染进程渲染,由于不能保证文件数什么时候构建完成,所以需要单独获取activeFile的状态
+    //通知渲染进程渲染,由于不能保证文件树什么时候构建完成,所以需要单独获取activeFile的状态
     const activeFile = this.get("activeFile");
     let activeFileItem: FileItem | null = null;
     if (activeFile && fs.existsSync(activeFile)) {
@@ -66,8 +69,15 @@ export class Workspace {
     log.info("init-workspace", JSON.stringify(init));
     win.webContents.send("init-workspace", init);
   }
+
   public getWorkspaceDir(): string {
     return this.workspaceDir;
+  }
+
+  public setActiveFile(filePath: string): void {
+    if (filePath === this.get("activeFile")) return;
+    this.addTab(filePath);
+    this.set("activeFile", filePath);
   }
   public getActiveFileItem(): FileItem | null {
     const activeFile = this.get("activeFile");
@@ -76,15 +86,18 @@ export class Workspace {
     }
     return null;
   }
+
   public getExpandedFolders(): string[] {
     return this.get("expandedFolders");
   }
-  public setActiveFile(filePath: string): void {
-    if (filePath === this.get("activeFile")) return;
-    this.addTab(filePath);
-    this.set("activeFile", filePath);
+  public removeExpandIfExist(pathname: string): void {
+    const expandedFolders = this.getExpandedFolders();
+    const idx = expandedFolders.indexOf(pathname);
+    if (idx !== -1) {
+      expandedFolders.splice(idx, 1);
+      this.set("expandedFolders", expandedFolders);
+    }
   }
-
   public toggleExpand(filePath: string): void {
     //需要动态更新isExpandedAll的状态
     const expandedFolders = this.getExpandedFolders();
@@ -107,19 +120,18 @@ export class Workspace {
       this.set("isExpandedAll", true);
     }
   }
-  isExpandedAll(): boolean {
+  public isExpandedAll(): boolean {
     log.info(this.getExpandedFolders().length, this.folderCount);
     return this.getExpandedFolders().length === this.folderCount;
   }
 
-  setActiveTab(tabPath: string): void {
+  public setActiveTab(tabPath: string): void {
     const exists = this.getTabs().some((t) => t.path === tabPath);
     if (!exists) {
       log.error("tabPath doesn't exist in tabs");
     }
     this.setActiveFile(tabPath);
   }
-
   private addTab(tabPath: string): void {
     if (tabPath === this.get("activeFile")) return;
     const tabs = this.get("tabs");
@@ -175,6 +187,7 @@ export class Workspace {
   private has(kay: string): boolean {
     return this.store.has(kay);
   }
+
   private listenForIpcMain() {
     ipcMain.on("WATCHER_DIR_EVENT", (e, arg) => {
       const { event, pathname, win } = arg;
@@ -184,8 +197,10 @@ export class Workspace {
           break;
         }
         case "unlink": {
-          //如果删除的文件被选中或者在Tab中?
           this.projectTree.unlinkFile(pathname);
+          if (this.get("tabs").some((t) => t.path === pathname)) {
+            this.closeTab(pathname);
+          }
           break;
         }
         case "addDir": {
@@ -194,16 +209,23 @@ export class Workspace {
           break;
         }
         case "unlinkDir": {
-          //如果被删除的文件夹包含激活的文件?
           this.folderCount--;
           this.projectTree.unlinkDir(pathname);
+          this.removeExpandIfExist(pathname);
           break;
         }
         default: {
           throw new Error(`Unknown event: ${event}`);
         }
       }
-      win?.webContents.send("UPDATE_PROJECT_TREE", this.projectTree.clone());
+      const update={
+        tree:this.projectTree.getTree(),
+        activeFile: this.getActiveFileItem(),
+        tabs: this.getTabs(),
+        expandedFolders: this.getExpandedFolders(),
+        isExpandedAll: this.isExpandedAll(),
+      }
+      win?.webContents.send("UPDATE_WORKSPACE", update);
     });
   }
   private listenForRenderer() {

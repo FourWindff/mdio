@@ -18,10 +18,10 @@ export const FileItemComponent = ({
   const { state, handleToggleExpand, handleActiveFile, handleActiveItem } = useWorkspace();
   const isExpanded = state.expandedFolders?.includes(file.path);
   const isSelected = state.activeFile?.path === file.path;
+  const editMode = state.renameCache === file.path;
 
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
 
-  const [editMode, setEditMode] = useState<boolean>(false);
   const [inputName, setInputName] = useState<string>(file.basename);
   const [modal, showModal] = useModal();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +30,7 @@ export const FileItemComponent = ({
 
   useEffect(() => {
     if (editMode && inputRef.current) {
-      setEditMode(true);
+
       // 延迟聚焦以确保DOM已更新
       setTimeout(() => {
         inputRef.current?.focus();
@@ -79,7 +79,7 @@ export const FileItemComponent = ({
 
   return (
     <div
-      style={{ paddingLeft: `${depth * 5}px`}}
+      style={{ paddingLeft: `${depth * 5}px` }}
       onContextMenu={(e: React.MouseEvent) =>
         handleContextMenu(e)
       }

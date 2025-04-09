@@ -4,6 +4,7 @@ import chokidar from "chokidar";
 
 import { isOsx } from "../config";
 import { Preference } from "../preference";
+import path from "node:path";
 
 interface ChangeEvent {
   windowId: number;
@@ -13,7 +14,7 @@ interface ChangeEvent {
 }
 type WatchType = "dir" | "file";
 
-export const WATCHER_STABILITY_THRESHOLD = 1000;
+export const WATCHER_STABILITY_THRESHOLD = 200;
 export const WATCHER_STABILITY_POLL_INTERVAL = 150;
 const EVENT_NAME = {
   dir: "WATCHER_DIR_EVENT",
@@ -63,7 +64,7 @@ export class Watcher {
         if (/(?:^|[/\\])(?:\..|node_modules|(?:.+\.asar))/.test(pathname)) {
           return true;
         }
-        if (fileInfo.isDirectory()) {
+        if (fileInfo.isDirectory() || path.basename(pathname).startsWith("New File")) {
           return false;
         }
         return false;
@@ -82,6 +83,7 @@ export class Watcher {
     let disposed = false;
     let enospcReached = false;
     let renameTimer = null;
+    
     watcher
       .on("add", async (pathname) => {
         if (!(await this._shouldIgnoreChangeEvent(win.id, pathname, type))) {

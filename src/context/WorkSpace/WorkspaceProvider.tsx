@@ -3,6 +3,8 @@ import { workspaceReducer } from "./WorkspaceReducer";
 import { initialWorkspaceState, WorkspaceContext } from "./WorkspaceContext";
 import { FileItem, Tab } from "@/types/types";
 import { IpcRendererEvent } from "electron";
+import { NEW_DIRECTORY, NEW_FILE } from "@/components/ui/ContextMenu/sidebar";
+
 
 export default function WorkSpaceProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(workspaceReducer, initialWorkspaceState);
@@ -32,20 +34,27 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
       dispatch({ type: "SET_EXPANDED_STATUS", payload: isExpandedAll });
       dispatch({ type: "SET_EXPANDED_FOLDERS", payload: expandedFolders });
     }
-    const handleUpdateProjectTree = (_: IpcRendererEvent, tree: FileItem) => {
+    const handleUpdateWorkspace = (
+      _: IpcRendererEvent,
+      { tree, activeFile, tabs, expandedFolders, isExpandedAll }:
+        { tree: FileItem, activeFile: FileItem, tabs: Tab[], expandedFolders: string[], isExpandedAll: boolean }) => {
       dispatch({ type: "SET_TREE", payload: tree });
+      dispatch({ type: "SET_ACTIVE_FILE", payload: activeFile });
+      dispatch({ type: "SET_TABS", payload: tabs });
+      dispatch({ type: "SET_EXPANDED_FOLDERS", payload: expandedFolders });
+      dispatch({ type: "SET_EXPANDED_STATUS", payload: isExpandedAll });
     }
 
     window.ipcRenderer.on("init-workspace", handleinitWorkspace)
-    window.ipcRenderer.on("UPDATE_PROJECT_TREE", handleUpdateProjectTree)
+    window.ipcRenderer.on("UPDATE_WORKSPACE", handleUpdateWorkspace)
     return () => {
       window.ipcRenderer.off("init-workspace", handleinitWorkspace);
-      window.ipcRenderer.off("UPDATE_PROJECT_TREE", handleUpdateProjectTree);
+      window.ipcRenderer.off("UPDATE_WORKSPACE", handleUpdateWorkspace);
     }
   }, []);
 
   const handleActiveFile = useCallback((filePath: string) => {
-    if(filePath===state.activeFile?.path) return ;
+    if (filePath === state.activeFile?.path) return;
     window.ipcRenderer.invoke("active-file", filePath).then(({ activeFile, tabs }) => {
       console.log("当前选中的文件以及标签页:", activeFile, tabs);
       dispatch({ type: "SET_ACTIVE_FILE", payload: activeFile });
@@ -53,7 +62,7 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
     })
   }, [state.activeFile?.path]);
   const handleActiveTab = useCallback((filePath: string) => {
-    if(filePath===state.activeFile?.path) return ;
+    if (filePath === state.activeFile?.path) return;
     window.ipcRenderer.invoke("active-tab", filePath).then(({ activeFile }) => {
       console.log("当前选中的文件以及标签页:", activeFile);
       dispatch({ type: "SET_ACTIVE_FILE", payload: activeFile });
@@ -96,16 +105,16 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
     })
   }, []);
 
-  const handleActiveItem=useCallback((item:FileItem)=>{
-    dispatch({type:"SET_ACTIVE_ITEM",payload:item});
-  },[])
+  const handleActiveItem = useCallback((item: FileItem) => {
+    dispatch({ type: "SET_ACTIVE_ITEM", payload: item });
+  }, [])
 
 
   const handleCreateFile = useCallback(() => {
-    alert("create New File")
+    window.ipcRenderer.send("ask-for-create-file", state.workPath, NEW_FILE);
   }, []);
   const handleCreateFolder = useCallback(() => {
-    alert("create New Folder")
+    window.ipcRenderer.send("ask-for-create-directory",state.workPath,NEW_DIRECTORY);
   }, []);
 
 
@@ -114,6 +123,7 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
   // 提供上下文值
   const contextValue = {
     state,
+    dispatch,
     handleActiveFile,
     handleActiveTab,
     handleCloseTab,

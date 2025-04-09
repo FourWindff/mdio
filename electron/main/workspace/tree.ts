@@ -3,6 +3,7 @@ import path from "path";
 import { getFilenameWithoutExt } from "../fileSystem";
 import fs from "fs";
 import log from "electron-log/node";
+import { Tree } from './tree';
 
 export class Tree {
   private root: FileItem;
@@ -110,6 +111,7 @@ export class Tree {
     }
   }
   unlinkFile(filepath: string) {
+    log.info("tree-unlinkFile:", filepath);
     const dirname = path.dirname(filepath);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
 
@@ -132,6 +134,7 @@ export class Tree {
     }
   }
   unlinkDir(dirpath: string) {
+    log.info("tree-unlinkDir:", dirpath);
     const subDirectories = this.getSubdirectoriesFromRoot(dirpath);
 
     subDirectories.pop();
@@ -179,7 +182,7 @@ export class Tree {
     });
     return fileItem || null;
   }
-  clone(): FileItem {
+  public clone(): FileItem {
     //clone all ???
     const clone = (item: FileItem): FileItem => {
       return {
@@ -189,5 +192,8 @@ export class Tree {
       };
     };
     return clone(this.root);
+  }
+  public getTree():FileItem{
+    return this.root;
   }
 }
