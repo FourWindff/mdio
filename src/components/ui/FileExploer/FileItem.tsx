@@ -15,7 +15,7 @@ export const FileItemComponent = ({
   file,
   depth = 0,
 }: FileItemProps) => {
-  const { state, handleToggleExpand, handleActiveFile, handleActiveItem } = useWorkspace();
+  const { state, dispatch, handleToggleExpand, handleActiveFile, handleActiveItem } = useWorkspace();
   const isExpanded = state.expandedFolders?.includes(file.path);
   const isSelected = state.activeFile?.path === file.path;
   const editMode = state.renameCache === file.path;
@@ -50,7 +50,9 @@ export const FileItemComponent = ({
   }, [editMode, file.isDirectory, editMode]);
 
   const handleRename = () => {
-    console.log("rename")
+    console.log("rename");
+    window.ipcRenderer.send("ask-for-rename",file.path,inputName);
+    dispatch({ type: "SET_RENAME_CACHE", payload: null })
   };
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -95,6 +97,7 @@ export const FileItemComponent = ({
         <i
           className={`${styles.icon + " " + (file.isDirectory ? (isExpanded ? "expand-more" : "expand-less") : null)} `}
         />
+
         {editMode ? (
           <form
             onSubmit={handleRename}
@@ -111,9 +114,8 @@ export const FileItemComponent = ({
               className={styles.renameInput}
             />
           </form>
-        ) : (
-          <span className={styles.fileName}>{file.name}</span>
-        )}
+        ) : <span className={styles.fileName}>{file.name}</span>}
+
       </div>
       {isExpanded &&
         file.folders.map((child) => (

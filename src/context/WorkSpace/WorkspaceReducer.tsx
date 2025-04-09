@@ -1,7 +1,6 @@
 import { FileItem, Tab } from "@/types/types";
 import { initialWorkspaceState, WorkspaceState } from "./WorkspaceContext";
 import { SortType } from "@electron/common/types";
-import { set } from "lodash-es";
 
 export type WorkspaceAction =
   //初始化
@@ -14,7 +13,7 @@ export type WorkspaceAction =
   | { type: "SET_SORT_TYPE"; payload: SortType }
   //For context menu
   | { type: "SET_ACTIVE_ITEM"; payload: FileItem }
-  | {type:"SET_RENAME_CACHE";payload:string}
+  | {type:"SET_RENAME_CACHE";payload:string | null}
   | {type:"SET_PASTE_CACHE";payload:FileItem[]}
 
 export const workspaceReducer = (

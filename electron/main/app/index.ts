@@ -229,8 +229,10 @@ class App {
           log.warn(err);
           return;
         });
+        const parentPath=path.dirname(oldPath);
+        const uniqueName=getUniquenName(parentPath,newName);
         try {
-          const newPath = path.join(path.dirname(oldPath), newName);
+          const newPath = path.join(parentPath, uniqueName);
           await fs.rename(oldPath, newPath);
         } catch (error) {
           log.error("rename fail:", error);

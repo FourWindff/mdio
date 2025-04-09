@@ -112,10 +112,10 @@ export default function WorkSpaceProvider({ children }: { children: ReactNode })
 
   const handleCreateFile = useCallback(() => {
     window.ipcRenderer.send("ask-for-create-file", state.workPath, NEW_FILE);
-  }, []);
+  }, [state.workPath]);
   const handleCreateFolder = useCallback(() => {
     window.ipcRenderer.send("ask-for-create-directory",state.workPath,NEW_DIRECTORY);
-  }, []);
+  }, [state.workPath]);
 
 
 

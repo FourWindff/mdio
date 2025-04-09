@@ -22831,8 +22831,10 @@ class App {
           log$1.warn(err);
           return;
         });
+        const parentPath = sysPath__default.dirname(oldPath);
+        const uniqueName = getUniquenName(parentPath, newName);
         try {
-          const newPath = sysPath__default.join(sysPath__default.dirname(oldPath), newName);
+          const newPath = sysPath__default.join(parentPath, uniqueName);
           await fs$n.rename(oldPath, newPath);
         } catch (error2) {
           log$1.error("rename fail:", error2);
