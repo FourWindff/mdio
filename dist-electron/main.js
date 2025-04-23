@@ -9,13 +9,13 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var _validator, _encryptionKey, _options, _defaultValues;
-import * as path$h from "node:path";
+import * as path$i from "node:path";
 import path__default, { resolve as resolve$5, join, relative, sep } from "node:path";
 import fs$o, { lstat, stat as stat$5, readdir, realpath } from "node:fs/promises";
 import electron, { ipcMain as ipcMain$1, nativeTheme, app as app$2, BrowserWindow, dialog } from "electron";
 import fs$n, { realpath as realpath$1, stat as stat$6, lstat as lstat$1, open, readdir as readdir$1 } from "fs/promises";
-import * as sysPath from "path";
-import sysPath__default from "path";
+import * as path$h from "path";
+import path__default$1 from "path";
 import { fileURLToPath } from "node:url";
 import fs$m, { unwatchFile, watchFile, watch as watch$1, stat as stat$7 } from "fs";
 import require$$0$3, { EventEmitter } from "events";
@@ -546,7 +546,7 @@ const binaryExtensions = /* @__PURE__ */ new Set([
   "zip",
   "zipx"
 ]);
-const isBinaryPath = (filePath) => binaryExtensions.has(sysPath.extname(filePath).slice(1).toLowerCase());
+const isBinaryPath = (filePath) => binaryExtensions.has(path$h.extname(filePath).slice(1).toLowerCase());
 const foreach = (val, fn) => {
   if (val instanceof Set) {
     val.forEach(fn);
@@ -584,7 +584,7 @@ function createFsWatchInstance(path2, options, listener, errHandler, emitRaw) {
     listener(path2);
     emitRaw(rawEvent, evPath, { watchedPath: path2 });
     if (evPath && path2 !== evPath) {
-      fsWatchBroadcast(sysPath.resolve(path2, evPath), KEY_LISTENERS, sysPath.join(path2, evPath));
+      fsWatchBroadcast(path$h.resolve(path2, evPath), KEY_LISTENERS, path$h.join(path2, evPath));
     }
   };
   try {
@@ -718,11 +718,11 @@ class NodeFsHandler {
    */
   _watchWithNodeFs(path2, listener) {
     const opts = this.fsw.options;
-    const directory = sysPath.dirname(path2);
-    const basename = sysPath.basename(path2);
+    const directory = path$h.dirname(path2);
+    const basename = path$h.basename(path2);
     const parent = this.fsw._getWatchedDir(directory);
     parent.add(basename);
-    const absolutePath = sysPath.resolve(path2);
+    const absolutePath = path$h.resolve(path2);
     const options = {
       persistent: opts.persistent
     };
@@ -753,8 +753,8 @@ class NodeFsHandler {
     if (this.fsw.closed) {
       return;
     }
-    const dirname = sysPath.dirname(file2);
-    const basename = sysPath.basename(file2);
+    const dirname = path$h.dirname(file2);
+    const basename = path$h.basename(file2);
     const parent = this.fsw._getWatchedDir(dirname);
     let prevStats = stats;
     if (parent.has(basename))
@@ -845,7 +845,7 @@ class NodeFsHandler {
     this.fsw._symlinkPaths.set(full, true);
   }
   _handleRead(directory, initialAdd, wh, target, dir, depth, throttler) {
-    directory = sysPath.join(directory, "");
+    directory = path$h.join(directory, "");
     throttler = this.fsw._throttle("readdir", directory, 1e3);
     if (!throttler)
       return;
@@ -863,7 +863,7 @@ class NodeFsHandler {
         return;
       }
       const item = entry.path;
-      let path2 = sysPath.join(directory, item);
+      let path2 = path$h.join(directory, item);
       current.add(item);
       if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path2, item)) {
         return;
@@ -874,7 +874,7 @@ class NodeFsHandler {
       }
       if (item === target || !target && !previous.has(item)) {
         this.fsw._incrReadyCount();
-        path2 = sysPath.join(dir, sysPath.relative(dir, path2));
+        path2 = path$h.join(dir, path$h.relative(dir, path2));
         this._addToNodeFs(path2, initialAdd, wh, depth + 1);
       }
     }).on(EV.ERROR, this._boundHandleError);
@@ -911,12 +911,12 @@ class NodeFsHandler {
    * @returns closer for the watcher instance.
    */
   async _handleDir(dir, stats, initialAdd, depth, target, wh, realpath2) {
-    const parentDir = this.fsw._getWatchedDir(sysPath.dirname(dir));
-    const tracked = parentDir.has(sysPath.basename(dir));
+    const parentDir = this.fsw._getWatchedDir(path$h.dirname(dir));
+    const tracked = parentDir.has(path$h.basename(dir));
     if (!(initialAdd && this.fsw.options.ignoreInitial) && !target && !tracked) {
       this.fsw._emit(EV.ADD_DIR, dir, stats);
     }
-    parentDir.add(sysPath.basename(dir));
+    parentDir.add(path$h.basename(dir));
     this.fsw._getWatchedDir(dir);
     let throttler;
     let closer;
@@ -966,7 +966,7 @@ class NodeFsHandler {
       const follow = this.fsw.options.followSymlinks;
       let closer;
       if (stats.isDirectory()) {
-        const absPath = sysPath.resolve(path2);
+        const absPath = path$h.resolve(path2);
         const targetPath = follow ? await realpath$1(path2) : path2;
         if (this.fsw.closed)
           return;
@@ -980,14 +980,14 @@ class NodeFsHandler {
         const targetPath = follow ? await realpath$1(path2) : path2;
         if (this.fsw.closed)
           return;
-        const parent = sysPath.dirname(wh.watchPath);
+        const parent = path$h.dirname(wh.watchPath);
         this.fsw._getWatchedDir(parent).add(wh.watchPath);
         this.fsw._emit(EV.ADD, wh.watchPath, stats);
         closer = await this._handleDir(parent, stats, initialAdd, depth, path2, wh, targetPath);
         if (this.fsw.closed)
           return;
         if (targetPath !== void 0) {
-          this.fsw._symlinkPaths.set(sysPath.resolve(path2), targetPath);
+          this.fsw._symlinkPaths.set(path$h.resolve(path2), targetPath);
         }
       } else {
         closer = this._handleFile(wh.watchPath, stats, initialAdd);
@@ -1030,11 +1030,11 @@ function createPattern(matcher) {
       if (matcher.path === string)
         return true;
       if (matcher.recursive) {
-        const relative2 = sysPath.relative(matcher.path, string);
+        const relative2 = path$h.relative(matcher.path, string);
         if (!relative2) {
           return false;
         }
-        return !relative2.startsWith("..") && !sysPath.isAbsolute(relative2);
+        return !relative2.startsWith("..") && !path$h.isAbsolute(relative2);
       }
       return false;
     };
@@ -1044,7 +1044,7 @@ function createPattern(matcher) {
 function normalizePath(path2) {
   if (typeof path2 !== "string")
     throw new Error("string expected");
-  path2 = sysPath.normalize(path2);
+  path2 = path$h.normalize(path2);
   path2 = path2.replace(/\\/g, "/");
   let prepend = false;
   if (path2.startsWith("//"))
@@ -1099,19 +1099,19 @@ const toUnix = (string) => {
   }
   return str;
 };
-const normalizePathToUnix = (path2) => toUnix(sysPath.normalize(toUnix(path2)));
+const normalizePathToUnix = (path2) => toUnix(path$h.normalize(toUnix(path2)));
 const normalizeIgnored = (cwd2 = "") => (path2) => {
   if (typeof path2 === "string") {
-    return normalizePathToUnix(sysPath.isAbsolute(path2) ? path2 : sysPath.join(cwd2, path2));
+    return normalizePathToUnix(path$h.isAbsolute(path2) ? path2 : path$h.join(cwd2, path2));
   } else {
     return path2;
   }
 };
 const getAbsolutePath = (path2, cwd2) => {
-  if (sysPath.isAbsolute(path2)) {
+  if (path$h.isAbsolute(path2)) {
     return path2;
   }
-  return sysPath.join(cwd2, path2);
+  return path$h.join(cwd2, path2);
 };
 const EMPTY_SET = Object.freeze(/* @__PURE__ */ new Set());
 class DirEntry {
@@ -1139,7 +1139,7 @@ class DirEntry {
       await readdir$1(dir);
     } catch (err) {
       if (this._removeWatcher) {
-        this._removeWatcher(sysPath.dirname(dir), sysPath.basename(dir));
+        this._removeWatcher(path$h.dirname(dir), path$h.basename(dir));
       }
     }
   }
@@ -1171,7 +1171,7 @@ class WatchHelper {
     const watchPath = path2;
     this.path = path2 = path2.replace(REPLACER_RE, "");
     this.watchPath = watchPath;
-    this.fullWatchPath = sysPath.resolve(watchPath);
+    this.fullWatchPath = path$h.resolve(watchPath);
     this.dirParts = [];
     this.dirParts.forEach((parts) => {
       if (parts.length > 1)
@@ -1181,7 +1181,7 @@ class WatchHelper {
     this.statMethod = follow ? STAT_METHOD_F : STAT_METHOD_L;
   }
   entryPath(entry) {
-    return sysPath.join(this.watchPath, sysPath.relative(this.watchPath, entry.fullPath));
+    return path$h.join(this.watchPath, path$h.relative(this.watchPath, entry.fullPath));
   }
   filterPath(entry) {
     const { stats } = entry;
@@ -1313,7 +1313,7 @@ class FSWatcher extends EventEmitter {
         return;
       results.forEach((item) => {
         if (item)
-          this.add(sysPath.dirname(item), sysPath.basename(_origAdd || item));
+          this.add(path$h.dirname(item), path$h.basename(_origAdd || item));
       });
     });
     return this;
@@ -1327,10 +1327,10 @@ class FSWatcher extends EventEmitter {
     const paths = unifyPaths(paths_);
     const { cwd: cwd2 } = this.options;
     paths.forEach((path2) => {
-      if (!sysPath.isAbsolute(path2) && !this._closers.has(path2)) {
+      if (!path$h.isAbsolute(path2) && !this._closers.has(path2)) {
         if (cwd2)
-          path2 = sysPath.join(cwd2, path2);
-        path2 = sysPath.resolve(path2);
+          path2 = path$h.join(cwd2, path2);
+        path2 = path$h.resolve(path2);
       }
       this._closePath(path2);
       this._addIgnoredPath(path2);
@@ -1379,7 +1379,7 @@ class FSWatcher extends EventEmitter {
   getWatched() {
     const watchList = {};
     this._watched.forEach((entry, dir) => {
-      const key = this.options.cwd ? sysPath.relative(this.options.cwd, dir) : dir;
+      const key = this.options.cwd ? path$h.relative(this.options.cwd, dir) : dir;
       const index = key || ONE_DOT;
       watchList[index] = entry.getChildren().sort();
     });
@@ -1405,9 +1405,9 @@ class FSWatcher extends EventEmitter {
       return;
     const opts = this.options;
     if (isWindows$1)
-      path2 = sysPath.normalize(path2);
+      path2 = path$h.normalize(path2);
     if (opts.cwd)
-      path2 = sysPath.relative(opts.cwd, path2);
+      path2 = path$h.relative(opts.cwd, path2);
     const args = [path2];
     if (stats != null)
       args.push(stats);
@@ -1458,7 +1458,7 @@ class FSWatcher extends EventEmitter {
         return this;
     }
     if (opts.alwaysStat && stats === void 0 && (event === EVENTS.ADD || event === EVENTS.ADD_DIR || event === EVENTS.CHANGE)) {
-      const fullPath = opts.cwd ? sysPath.join(opts.cwd, path2) : path2;
+      const fullPath = opts.cwd ? path$h.join(opts.cwd, path2) : path2;
       let stats2;
       try {
         stats2 = await stat$6(fullPath);
@@ -1534,8 +1534,8 @@ class FSWatcher extends EventEmitter {
     const pollInterval = awf.pollInterval;
     let timeoutHandler;
     let fullPath = path2;
-    if (this.options.cwd && !sysPath.isAbsolute(path2)) {
-      fullPath = sysPath.join(this.options.cwd, path2);
+    if (this.options.cwd && !path$h.isAbsolute(path2)) {
+      fullPath = path$h.join(this.options.cwd, path2);
     }
     const now = /* @__PURE__ */ new Date();
     const writes = this._pendingWrites;
@@ -1605,7 +1605,7 @@ class FSWatcher extends EventEmitter {
    * @param directory path of the directory
    */
   _getWatchedDir(directory) {
-    const dir = sysPath.resolve(directory);
+    const dir = path$h.resolve(directory);
     if (!this._watched.has(dir))
       this._watched.set(dir, new DirEntry(dir, this._boundRemove));
     return this._watched.get(dir);
@@ -1628,8 +1628,8 @@ class FSWatcher extends EventEmitter {
    * @param item      base path of item/directory
    */
   _remove(directory, item, isDirectory) {
-    const path2 = sysPath.join(directory, item);
-    const fullPath = sysPath.resolve(path2);
+    const path2 = path$h.join(directory, item);
+    const fullPath = path$h.resolve(path2);
     isDirectory = isDirectory != null ? isDirectory : this._watched.has(path2) || this._watched.has(fullPath);
     if (!this._throttle("remove", path2, 100))
       return;
@@ -1647,7 +1647,7 @@ class FSWatcher extends EventEmitter {
     }
     let relPath = path2;
     if (this.options.cwd)
-      relPath = sysPath.relative(this.options.cwd, path2);
+      relPath = path$h.relative(this.options.cwd, path2);
     if (this.options.awaitWriteFinish && this._pendingWrites.has(relPath)) {
       const event = this._pendingWrites.get(relPath).cancelWait();
       if (event === EVENTS.ADD)
@@ -1665,8 +1665,8 @@ class FSWatcher extends EventEmitter {
    */
   _closePath(path2) {
     this._closeFile(path2);
-    const dir = sysPath.dirname(path2);
-    this._getWatchedDir(dir).remove(sysPath.basename(path2));
+    const dir = path$h.dirname(path2);
+    this._getWatchedDir(dir).remove(path$h.basename(path2));
   }
   /**
    * Closes only file-specific watchers
@@ -17904,7 +17904,7 @@ function requirePackageJson() {
   if (hasRequiredPackageJson) return packageJson;
   hasRequiredPackageJson = 1;
   const fs2 = fs$m;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   packageJson = {
     findAndReadPackageJson,
     tryReadJsonAt
@@ -17977,7 +17977,7 @@ function requireNodeExternalApi() {
   hasRequiredNodeExternalApi = 1;
   const childProcess = require$$0$1;
   const os2 = require$$1$1;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   const packageJson2 = requirePackageJson();
   class NodeExternalApi {
     constructor() {
@@ -18158,7 +18158,7 @@ var hasRequiredElectronExternalApi;
 function requireElectronExternalApi() {
   if (hasRequiredElectronExternalApi) return ElectronExternalApi_1;
   hasRequiredElectronExternalApi = 1;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   const NodeExternalApi = requireNodeExternalApi();
   class ElectronExternalApi extends NodeExternalApi {
     /**
@@ -18344,7 +18344,7 @@ function requireInitialize() {
   hasRequiredInitialize = 1;
   const fs2 = fs$m;
   const os2 = require$$1$1;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   const preloadInitializeFn = requireElectronLogPreload();
   initialize = {
     initialize({
@@ -19303,7 +19303,7 @@ function requireFileRegistry() {
   hasRequiredFileRegistry = 1;
   const EventEmitter2 = require$$0$3;
   const fs2 = fs$m;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   const File = requireFile$1();
   const NullFile = requireNullFile();
   class FileRegistry extends EventEmitter2 {
@@ -19374,7 +19374,7 @@ function requireFile() {
   hasRequiredFile = 1;
   const fs2 = fs$m;
   const os2 = require$$1$1;
-  const path2 = sysPath__default;
+  const path2 = path__default$1;
   const FileRegistry = requireFileRegistry();
   const { transform } = requireTransform();
   const { removeStyles } = requireStyle();
@@ -19794,8 +19794,8 @@ const DEFAULT_WORKSPACE = Object.freeze({
   isExpandedAll: false
 });
 function getFilenameWithoutExt(filePath) {
-  const basename = path$h.basename(filePath);
-  const extension = path$h.extname(basename);
+  const basename = path$i.basename(filePath);
+  const extension = path$i.extname(basename);
   return basename.slice(0, basename.length - extension.length);
 }
 const node = requireNode();
@@ -19807,7 +19807,7 @@ class Tree {
     const stat2 = fs$m.statSync(rootPath);
     if (stat2.isFile()) throw new Error("workspaceDir should be a directory");
     this.root = {
-      basename: sysPath__default.basename(rootPath),
+      basename: path__default$1.basename(rootPath),
       name: getFilenameWithoutExt(rootPath),
       extension: "",
       path: rootPath,
@@ -19830,7 +19830,7 @@ class Tree {
   }
   addFile(pathname) {
     log.info("tree-addFile:", pathname);
-    const dirname = sysPath__default.dirname(pathname);
+    const dirname = path__default$1.dirname(pathname);
     const name = getFilenameWithoutExt(pathname);
     const stat2 = fs$m.statSync(pathname);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
@@ -19844,7 +19844,7 @@ class Tree {
           basename: directoryName,
           name: directoryName,
           extension: "",
-          path: sysPath__default.join(currentPath, directoryName),
+          path: path__default$1.join(currentPath, directoryName),
           isFile: false,
           isDirectory: true,
           createTime: stat2.birthtimeMs,
@@ -19854,15 +19854,15 @@ class Tree {
         };
         currentSubFolders.push(childFolder);
       }
-      currentPath = sysPath__default.join(currentPath, directoryName);
+      currentPath = path__default$1.join(currentPath, directoryName);
       currentFolder = childFolder;
       currentSubFolders = childFolder.folders;
     }
     if (!currentFolder.files.find((f) => f.name === name)) {
       const newItem = {
-        basename: sysPath__default.basename(pathname),
+        basename: path__default$1.basename(pathname),
         name: getFilenameWithoutExt(pathname),
-        extension: sysPath__default.extname(pathname).toLowerCase(),
+        extension: path__default$1.extname(pathname).toLowerCase(),
         path: pathname,
         isFile: true,
         isDirectory: false,
@@ -19887,7 +19887,7 @@ class Tree {
           basename: directoryName,
           name: directoryName,
           extension: "",
-          path: sysPath__default.join(currentPath, directoryName),
+          path: path__default$1.join(currentPath, directoryName),
           isFile: false,
           isDirectory: true,
           createTime: stat2.birthtimeMs,
@@ -19897,13 +19897,13 @@ class Tree {
         };
         currentSubFolders.push(childFolder);
       }
-      currentPath = sysPath__default.join(currentPath, directoryName);
+      currentPath = path__default$1.join(currentPath, directoryName);
       currentSubFolders = childFolder.folders;
     }
   }
   unlinkFile(filepath) {
     log.info("tree-unlinkFile:", filepath);
-    const dirname = sysPath__default.dirname(filepath);
+    const dirname = path__default$1.dirname(filepath);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
     let currentFolder = this.root;
     let currentSubFolders = this.root.folders;
@@ -19942,14 +19942,14 @@ class Tree {
     }
   }
   getSubdirectoriesFromRoot(pathname) {
-    if (!sysPath__default.isAbsolute(pathname)) {
+    if (!path__default$1.isAbsolute(pathname)) {
       throw new Error("pathname should be absolute");
     }
-    const relativePath = sysPath__default.relative(this.root.path, pathname);
-    return relativePath ? relativePath.split(sysPath__default.sep) : [];
+    const relativePath = path__default$1.relative(this.root.path, pathname);
+    return relativePath ? relativePath.split(path__default$1.sep) : [];
   }
   getFileItemByPath(pathname) {
-    const dirname = sysPath__default.dirname(pathname);
+    const dirname = path__default$1.dirname(pathname);
     const subDirectories = this.getSubdirectoriesFromRoot(dirname);
     let currentFolder = this.root;
     let currentSubFolders = this.root.folders;
@@ -20839,7 +20839,7 @@ function retry() {
     exports.realpath.native = u2(fs2.realpath.native);
   }
 })(fs$k);
-const path$g = sysPath__default;
+const path$g = path__default$1;
 function getRootPath(p) {
   p = path$g.normalize(path$g.resolve(p)).split(path$g.sep);
   if (p.length > 0) return p[0];
@@ -20855,7 +20855,7 @@ var win32 = {
   invalidWin32Path: invalidWin32Path$2
 };
 const fs$i = gracefulFs;
-const path$f = sysPath__default;
+const path$f = path__default$1;
 const invalidWin32Path$1 = win32.invalidWin32Path;
 const o777$1 = parseInt("0777", 8);
 function mkdirs$2(p, opts, callback, made) {
@@ -20903,7 +20903,7 @@ function mkdirs$2(p, opts, callback, made) {
 }
 var mkdirs_1$1 = mkdirs$2;
 const fs$h = gracefulFs;
-const path$e = sysPath__default;
+const path$e = path__default$1;
 const invalidWin32Path = win32.invalidWin32Path;
 const o777 = parseInt("0777", 8);
 function mkdirsSync$2(p, opts, made) {
@@ -20976,7 +20976,7 @@ var utimes$1 = {
   utimesMillisSync
 };
 const fs$f = gracefulFs;
-const path$d = sysPath__default;
+const path$d = path__default$1;
 const NODE_VERSION_MAJOR_WITH_BIGINT = 10;
 const NODE_VERSION_MINOR_WITH_BIGINT = 5;
 const NODE_VERSION_PATCH_WITH_BIGINT = 0;
@@ -21146,7 +21146,7 @@ function requireBuffer() {
   return buffer;
 }
 const fs$e = gracefulFs;
-const path$c = sysPath__default;
+const path$c = path__default$1;
 const mkdirpSync$1 = mkdirs_1.mkdirsSync;
 const utimesSync = utimes$1.utimesMillisSync;
 const stat$3 = stat$4;
@@ -21287,7 +21287,7 @@ var pathExists_1 = {
   pathExistsSync: fs$d.existsSync
 };
 const fs$c = gracefulFs;
-const path$b = sysPath__default;
+const path$b = path__default$1;
 const mkdirp$1 = mkdirs_1.mkdirs;
 const pathExists$7 = pathExists_1.pathExists;
 const utimes = utimes$1.utimesMillis;
@@ -21467,7 +21467,7 @@ var copy$1 = {
   copy: u$9(copy_1)
 };
 const fs$b = gracefulFs;
-const path$a = sysPath__default;
+const path$a = path__default$1;
 const assert = require$$5$1;
 const isWindows = process.platform === "win32";
 function defaults(options) {
@@ -21714,7 +21714,7 @@ var remove$2 = {
 };
 const u$7 = universalify.fromCallback;
 const fs$a = gracefulFs;
-const path$9 = sysPath__default;
+const path$9 = path__default$1;
 const mkdir$5 = mkdirs_1;
 const remove$1 = remove$2;
 const emptyDir = u$7(function emptyDir2(dir, callback) {
@@ -21753,7 +21753,7 @@ var empty = {
   emptydir: emptyDir
 };
 const u$6 = universalify.fromCallback;
-const path$8 = sysPath__default;
+const path$8 = path__default$1;
 const fs$9 = gracefulFs;
 const mkdir$4 = mkdirs_1;
 const pathExists$6 = pathExists_1.pathExists;
@@ -21795,7 +21795,7 @@ var file$1 = {
   createFileSync
 };
 const u$5 = universalify.fromCallback;
-const path$7 = sysPath__default;
+const path$7 = path__default$1;
 const fs$8 = gracefulFs;
 const mkdir$3 = mkdirs_1;
 const pathExists$5 = pathExists_1.pathExists;
@@ -21845,7 +21845,7 @@ var link$1 = {
   createLink: u$5(createLink),
   createLinkSync
 };
-const path$6 = sysPath__default;
+const path$6 = path__default$1;
 const fs$7 = gracefulFs;
 const pathExists$4 = pathExists_1.pathExists;
 function symlinkPaths$1(srcpath, dstpath, callback) {
@@ -21943,7 +21943,7 @@ var symlinkType_1 = {
   symlinkTypeSync: symlinkTypeSync$1
 };
 const u$4 = universalify.fromCallback;
-const path$5 = sysPath__default;
+const path$5 = path__default$1;
 const fs$5 = gracefulFs;
 const _mkdirs = mkdirs_1;
 const mkdirs = _mkdirs.mkdirs;
@@ -22132,7 +22132,7 @@ var jsonfile = {
   writeJson: u$3(jsonFile$3.writeFile),
   writeJsonSync: jsonFile$3.writeFileSync
 };
-const path$4 = sysPath__default;
+const path$4 = path__default$1;
 const mkdir$2 = mkdirs_1;
 const pathExists$2 = pathExists_1.pathExists;
 const jsonFile$2 = jsonfile;
@@ -22153,7 +22153,7 @@ function outputJson(file2, data, options, callback) {
 }
 var outputJson_1 = outputJson;
 const fs$4 = gracefulFs;
-const path$3 = sysPath__default;
+const path$3 = path__default$1;
 const mkdir$1 = mkdirs_1;
 const jsonFile$1 = jsonfile;
 function outputJsonSync(file2, data, options) {
@@ -22176,7 +22176,7 @@ jsonFile.readJSON = jsonFile.readJson;
 jsonFile.readJSONSync = jsonFile.readJsonSync;
 var json = jsonFile;
 const fs$3 = gracefulFs;
-const path$2 = sysPath__default;
+const path$2 = path__default$1;
 const copySync = copySync$1.copySync;
 const removeSync = remove$2.removeSync;
 const mkdirpSync = mkdirs_1.mkdirpSync;
@@ -22218,7 +22218,7 @@ var moveSync = {
   moveSync: moveSync_1
 };
 const fs$2 = gracefulFs;
-const path$1 = sysPath__default;
+const path$1 = path__default$1;
 const copy = copy$1.copy;
 const remove = remove$2.remove;
 const mkdirp = mkdirs_1.mkdirp;
@@ -22279,7 +22279,7 @@ var move = {
 };
 const u = universalify.fromCallback;
 const fs$1 = gracefulFs;
-const path = sysPath__default;
+const path = path__default$1;
 const mkdir = mkdirs_1;
 const pathExists = pathExists_1.pathExists;
 function outputFile(file2, data, encoding, callback) {
@@ -22360,7 +22360,7 @@ class Workspace {
     this.win = win;
     this.store = new ElectronStore({
       name: CONFIG_NAME,
-      cwd: sysPath__default.join(workspaceDir, CONFIG_DIR),
+      cwd: path__default$1.join(workspaceDir, CONFIG_DIR),
       clearInvalidConfig: true
     });
     this.init(win);
@@ -22379,9 +22379,9 @@ class Workspace {
     if (activeFile && fs$m.existsSync(activeFile)) {
       const stat2 = fs$m.statSync(activeFile);
       activeFileItem = {
-        basename: sysPath__default.basename(activeFile),
+        basename: path__default$1.basename(activeFile),
         name: getFilenameWithoutExt(activeFile),
-        extension: sysPath__default.extname(activeFile),
+        extension: path__default$1.extname(activeFile),
         path: activeFile,
         isFile: true,
         isDirectory: false,
@@ -22609,7 +22609,7 @@ const getUniquenName = (dirPath, filename) => {
   if (!existingFiles.includes(filename)) {
     return filename;
   }
-  const ext = sysPath__default.extname(filename);
+  const ext = path__default$1.extname(filename);
   const baseName = ext ? filename.slice(0, -ext.length) : filename;
   let counter = 1;
   let newFilename;
@@ -22623,12 +22623,39 @@ const getUniquenName = (dirPath, filename) => {
   } while (existingFiles.includes(newFilename));
   return newFilename;
 };
-const __dirname$1 = sysPath__default.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = sysPath__default.join(__dirname$1, "..");
+async function copyFolderRecursive(source, target) {
+  await fs$n.mkdir(target, { recursive: true });
+  const entries = await fs$n.readdir(source, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path__default$1.join(source, entry.name);
+    const destPath = path__default$1.join(target, entry.name);
+    if (entry.isDirectory()) {
+      await copyFolderRecursive(srcPath, destPath);
+    } else {
+      await fs$n.copyFile(srcPath, destPath);
+    }
+  }
+}
+async function moveFolderRecursive(source, target) {
+  await fs$n.mkdir(target, { recursive: true });
+  const entries = await fs$n.readdir(source, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path__default$1.join(source, entry.name);
+    const destPath = path__default$1.join(target, entry.name);
+    if (entry.isDirectory()) {
+      await moveFolderRecursive(srcPath, destPath);
+    } else {
+      await fs$n.rename(srcPath, destPath);
+    }
+  }
+  await fs$n.rmdir(source, { recursive: true });
+}
+const __dirname$1 = path__default$1.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path__default$1.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-sysPath__default.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = sysPath__default.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? sysPath__default.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+path__default$1.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path__default$1.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path__default$1.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
 class App {
   constructor() {
     __publicField(this, "win");
@@ -22664,9 +22691,9 @@ class App {
       width: 1200,
       height: 800,
       frame: false,
-      icon: sysPath__default.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+      icon: path__default$1.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
       webPreferences: {
-        preload: sysPath__default.join(__dirname$1, "preload.mjs"),
+        preload: path__default$1.join(__dirname$1, "preload.mjs"),
         contextIsolation: true,
         nodeIntegration: false,
         devTools: true
@@ -22675,7 +22702,7 @@ class App {
     if (VITE_DEV_SERVER_URL) {
       win.loadURL(VITE_DEV_SERVER_URL);
     } else {
-      win.loadFile(sysPath__default.join(__dirname$1, "../../dist/index.html"));
+      win.loadFile(path__default$1.join(__dirname$1, "../../dist/index.html"));
     }
     ipcMain$1.on("minimize-window", () => {
       win.minimize();
@@ -22755,7 +22782,7 @@ class App {
     });
     ipcMain$1.handle("ask-for-read-file", async (_, filePath) => {
       try {
-        const extension = sysPath__default.extname(filePath).toLowerCase();
+        const extension = path__default$1.extname(filePath).toLowerCase();
         if (IMAGE_TYPE.includes(extension)) {
           const buffer2 = await fs$n.readFile(filePath);
           return buffer2.toString("base64");
@@ -22775,7 +22802,7 @@ class App {
       "ask-for-create-directory",
       async (_, parentPath, dirname) => {
         const uniqueName = getUniquenName(parentPath, dirname);
-        const dirPath = sysPath__default.join(parentPath, uniqueName);
+        const dirPath = path__default$1.join(parentPath, uniqueName);
         const stat2 = await fs$n.stat(dirPath).catch(() => false);
         if (stat2) {
           log$1.warn("Directory already exists:", dirPath);
@@ -22790,10 +22817,48 @@ class App {
       }
     );
     ipcMain$1.on(
+      "ask-for-cut-paste",
+      async (_, sourceItems, targetDir) => {
+        try {
+          for (const sourceItem of sourceItems) {
+            const sourcePath = sourceItem.path;
+            const uniqueName = await getUniquenName(targetDir, sourceItem.basename);
+            const targetPath = path__default$1.join(targetDir, uniqueName);
+            if (sourceItem.isDirectory) {
+              await moveFolderRecursive(sourcePath, targetPath);
+            } else {
+              await fs$n.rename(sourcePath, targetPath);
+            }
+          }
+        } catch (error2) {
+          console.error("文件移动时出错:", error2);
+        }
+      }
+    );
+    ipcMain$1.on(
+      "ask-for-copy-paste",
+      async (_, sourceItems, targetDir) => {
+        try {
+          for (const sourceItem of sourceItems) {
+            const sourcePath = sourceItem.path;
+            const uniqueName = await getUniquenName(targetDir, sourceItem.basename);
+            const targetPath = path__default$1.join(targetDir, uniqueName);
+            if (sourceItem.isDirectory) {
+              await copyFolderRecursive(sourcePath, targetPath);
+            } else {
+              await fs$n.copyFile(sourcePath, targetPath);
+            }
+          }
+        } catch (error2) {
+          console.error("文件复制时出错:", error2);
+        }
+      }
+    );
+    ipcMain$1.on(
       "ask-for-create-file",
       async (_, parentPath, filename) => {
         const uniqueName = getUniquenName(parentPath, filename);
-        const filePath = sysPath__default.join(parentPath, uniqueName);
+        const filePath = path__default$1.join(parentPath, uniqueName);
         const stat2 = await fs$n.stat(filePath).catch(() => false);
         if (stat2) {
           log$1.warn("File already exists:", filePath);
@@ -22831,10 +22896,10 @@ class App {
           log$1.warn(err);
           return;
         });
-        const parentPath = sysPath__default.dirname(oldPath);
+        const parentPath = path__default$1.dirname(oldPath);
         const uniqueName = getUniquenName(parentPath, newName);
         try {
-          const newPath = sysPath__default.join(parentPath, uniqueName);
+          const newPath = path__default$1.join(parentPath, uniqueName);
           await fs$n.rename(oldPath, newPath);
         } catch (error2) {
           log$1.error("rename fail:", error2);

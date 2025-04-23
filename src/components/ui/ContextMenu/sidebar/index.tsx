@@ -3,8 +3,8 @@ import { ReactNode } from "react";
 import ContextMenu, { MenuItem } from "..";
 import Button from "../../Button";
 import { DialogActions } from "../../Dialog/Dialog";
-import { newDirectory, newFile, remove } from "./action";
 import { useWorkspace } from "@/context/WorkSpace/WorkspaceContext";
+
 
 interface props {
   onClose: () => void;
@@ -17,7 +17,8 @@ export const NEW_FILE = "New File.lexical";
 export const NEW_DIRECTORY = "New Directory";
 
 export default function SidebarContextMenu({ event, onClose, item, hasPasteCache, showModal }: props) {
-  const { dispatch } = useWorkspace()
+  const { dispatch, state } = useWorkspace();
+
   return (
     <ContextMenu
       onClose={onClose}
@@ -25,32 +26,46 @@ export default function SidebarContextMenu({ event, onClose, item, hasPasteCache
     >
       {item.isDirectory &&
         <MenuItem
-          onClick={() => newFile(item.path, NEW_FILE)}
+          onClick={() => {
+            window.ipcRenderer.send("ask-for-create-file", item.path, NEW_FILE);
+          }}
           title="New file"
           iconClassName="file-plus" />
       }
       {item.isDirectory &&
         <MenuItem
-          onClick={() => newDirectory(item.path, NEW_DIRECTORY)}
+          onClick={() => {
+            window.ipcRenderer.send("ask-for-create-directory", item.path, NEW_DIRECTORY);
+          }}
           title="New directory"
           iconClassName="folder-plus" />
       }
       <MenuItem
-        onClick={()=>{
-          dispatch({type:"SET_PASTE_CACHE",payload:[item]})
-          console.log("copy",[item])
+        onClick={() => {
+          dispatch({ type: "SET_CLIPBOARD", payload: { paths: [item], operation: "copy" } })
+          console.log("copy", [item.path])
         }}
         title="Copy"
         iconClassName="file-copy" />
       {hasPasteCache &&
         <MenuItem
-          onClick={() => alert("paste")}
+          onClick={() => {
+            //粘贴
+            const { paths, operation } = state.clipboard;
+            const targetPath = item.path;
+            if (operation === "copy") {
+              window.ipcRenderer.send("ask-for-copy-paste", paths, targetPath);
+            }
+            if (operation === "cut") {
+              window.ipcRenderer.send("ask-for-cut-paste", paths, targetPath);
+            }
+          }}
           title="paste"
           iconClassName="file-paste" />}
       <MenuItem
-        onClick={()=>{
-          dispatch({type:"SET_PASTE_CACHE",payload:[item]})
-          console.log("cut",item)
+        onClick={() => {
+          dispatch({ type: "SET_CLIPBOARD", payload: { paths: [item], operation: "cut" } })
+          console.log("cut", item)
         }}
         title="Cut"
         iconClassName="file-cut" />
@@ -70,7 +85,7 @@ export default function SidebarContextMenu({ event, onClose, item, hasPasteCache
               <DialogActions>
                 <Button
                   onClick={() => {
-                    remove(item.path);
+                    window.ipcRenderer.send("ask-for-unlink", item.path);
                     closeModal();
                   }}
                 >

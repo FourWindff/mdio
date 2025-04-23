@@ -2,6 +2,7 @@ import { FileItem, Tab } from "@/types/types";
 import { initialWorkspaceState, WorkspaceState } from "./WorkspaceContext";
 import { SortType } from "@electron/common/types";
 
+
 export type WorkspaceAction =
   //初始化
   | { type: "SET_WORK_PATH"; payload: string }
@@ -13,8 +14,8 @@ export type WorkspaceAction =
   | { type: "SET_SORT_TYPE"; payload: SortType }
   //For context menu
   | { type: "SET_ACTIVE_ITEM"; payload: FileItem }
-  | {type:"SET_RENAME_CACHE";payload:string | null}
-  | {type:"SET_PASTE_CACHE";payload:FileItem[]}
+  | { type: "SET_RENAME_CACHE"; payload: string | null }
+  | { type: "SET_CLIPBOARD", payload: { paths: FileItem[], operation: "copy" | "cut" | null } }
 
 export const workspaceReducer = (
   state: WorkspaceState,
@@ -36,9 +37,11 @@ export const workspaceReducer = (
     case "SET_TABS":
       return { ...state, tabs: action.payload }
     case "SET_RENAME_CACHE":
-      return {...state,renameCache:action.payload}
-    case "SET_PASTE_CACHE":
-      return {...state,pasteCache:action.payload}
+      return { ...state, renameCache: action.payload }
+    case "SET_CLIPBOARD":
+      return { ...state, clipboard: action.payload }
+
+
 
     default:
       return state;

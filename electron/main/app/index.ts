@@ -7,10 +7,15 @@ import { Preference } from "../preference";
 import { Workspace } from "../workspace";
 import log from "electron-log";
 import { IMAGE_TYPE, TEXT_TYPE } from "../../common/types";
-import { getUniquenName } from "../../common/filesystem/paths";
+import {
+  copyFolderRecursive,
+  getUniquenName,
+  moveFolderRecursive,
+} from "../../common/filesystem/paths";
+import { FileItem } from "@/types/types";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname,".." );
+process.env.APP_ROOT = path.join(__dirname, "..");
 
 export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
@@ -171,39 +176,81 @@ class App {
     ipcMain.on(
       "ask-for-create-directory",
       async (_, parentPath: string, dirname: string) => {
-        const uniqueName=getUniquenName(parentPath,dirname);
+        const uniqueName = getUniquenName(parentPath, dirname);
         const dirPath = path.join(parentPath, uniqueName);
-        const stat= await fs.stat(dirPath).catch(()=>false);
-        if(stat){
+        const stat = await fs.stat(dirPath).catch(() => false);
+        if (stat) {
           log.warn("Directory already exists:", dirPath);
           return;
         }
         try {
           await fs.mkdir(dirPath, { recursive: true });
-          log.info("Create new file",dirPath)
+          log.info("Create new file", dirPath);
         } catch (error) {
           log.error("Error creating directory:", error);
         }
       }
     );
     ipcMain.on(
+      "ask-for-cut-paste",
+      async (_, sourceItems: FileItem[], targetDir: string) => {
+        // 剪切一个文件并粘贴，仍然会加1
+        try {
+          for (const sourceItem of sourceItems) {
+            const sourcePath = sourceItem.path;
+            const uniqueName = await getUniquenName(targetDir, sourceItem.basename);
+            const targetPath = path.join(targetDir, uniqueName);
+            if (sourceItem.isDirectory) {
+              await moveFolderRecursive(sourcePath, targetPath);
+            } else {
+              await fs.rename(sourcePath, targetPath);
+            }
+          }
+        } catch (error) {
+          console.error("文件移动时出错:", error);
+        }
+      }
+    );
+    
+    ipcMain.on(
+      "ask-for-copy-paste",
+      async (_, sourceItems: FileItem[], targetDir: string) => {
+        try {
+          for (const sourceItem of sourceItems) {
+            const sourcePath = sourceItem.path;
+            const uniqueName = await getUniquenName(targetDir, sourceItem.basename);
+            const targetPath = path.join(targetDir, uniqueName);
+            if (sourceItem.isDirectory) {
+              await copyFolderRecursive(sourcePath, targetPath);
+            } else {
+              await fs.copyFile(sourcePath, targetPath);
+            }
+          }
+        } catch (error) {
+          console.error("文件复制时出错:", error);
+        }
+      }
+    );
+
+    ipcMain.on(
       "ask-for-create-file",
       async (_, parentPath: string, filename: string) => {
-        const uniqueName=getUniquenName(parentPath,filename);
+        const uniqueName = getUniquenName(parentPath, filename);
         const filePath = path.join(parentPath, uniqueName);
-        const stat= await fs.stat(filePath).catch(()=>false);
-        if(stat){
+        const stat = await fs.stat(filePath).catch(() => false);
+        if (stat) {
           log.warn("File already exists:", filePath);
           return;
         }
         try {
           await fs.writeFile(filePath, "");
-          log.info("Create new file",filePath)
+          log.info("Create new file", filePath);
         } catch (error) {
           log.error("Error create file:", error);
         }
       }
     );
+
     ipcMain.on("ask-for-unlink", async (_, path: string) => {
       await fs.stat(path).catch((err) => {
         log.warn(err);
@@ -229,8 +276,8 @@ class App {
           log.warn(err);
           return;
         });
-        const parentPath=path.dirname(oldPath);
-        const uniqueName=getUniquenName(parentPath,newName);
+        const parentPath = path.dirname(oldPath);
+        const uniqueName = getUniquenName(parentPath, newName);
         try {
           const newPath = path.join(parentPath, uniqueName);
           await fs.rename(oldPath, newPath);

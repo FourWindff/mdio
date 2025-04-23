@@ -1,4 +1,5 @@
 import fs from "fs";
+import fsPromises from 'fs/promises'
 import path from "path";
 import { isFile, isFile2, isSymbolicLink } from "./index";
 import { readdir } from "node:fs/promises";
@@ -153,3 +154,34 @@ export const getUniquenName = (
   
   return newFilename;
 };
+// 递归复制文件夹
+export async function copyFolderRecursive(source: string, target: string) {
+  await fsPromises.mkdir(target, { recursive: true });
+  const entries = await fsPromises.readdir(source, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(source, entry.name);
+    const destPath = path.join(target, entry.name);
+    if (entry.isDirectory()) {
+      await copyFolderRecursive(srcPath, destPath);
+    } else {
+      await fsPromises.copyFile(srcPath, destPath);
+    }
+  }
+}
+
+// 递归移动文件夹
+export async function moveFolderRecursive(source: string, target: string) {
+  await fsPromises.mkdir(target, { recursive: true });
+  const entries = await fsPromises.readdir(source, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(source, entry.name);
+    const destPath = path.join(target, entry.name);
+    if (entry.isDirectory()) {
+      await moveFolderRecursive(srcPath, destPath);
+    } else {
+      await fsPromises.rename(srcPath, destPath);
+    }
+  }
+  // 移动完成后删除原文件夹
+  await fsPromises.rmdir(source, { recursive: true });
+}

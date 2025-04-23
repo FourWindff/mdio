@@ -241,7 +241,6 @@ i.icon {
   flex-shrink: 0;
   border-bottom: 1px solid var(--background-primary);
 }
-
 .tab {
   display: flex;
   align-items: center;
@@ -254,6 +253,7 @@ i.icon {
   cursor: pointer;
   user-select: none;
   position: relative;
+  border-radius: 10px 10px 0 0;
 }
 
 .tab.active {

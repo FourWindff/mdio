@@ -13,11 +13,10 @@ export interface WorkspaceState {
   sortType: SortType;
   //以下状态无需通过保存
   clipboard: {
-    items: FileItem[];
+    paths: FileItem[];
     operation: "copy" | "cut" | null;
   };
   renameCache:string| null;
-  pasteCache:FileItem[];
   
 }
 export const initialWorkspaceState: WorkspaceState = {
@@ -29,11 +28,10 @@ export const initialWorkspaceState: WorkspaceState = {
   isExpandedAll:false,
   sortType: SortType.ALPHABETICAL_ASC,
   clipboard: {
-    items: [],
+    paths: [],
     operation: null,
   },
   renameCache:null,
-  pasteCache:[]
 };
 
 export interface WorkspaceContextShape {

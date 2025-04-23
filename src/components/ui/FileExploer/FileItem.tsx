@@ -19,9 +19,9 @@ export const FileItemComponent = ({
   const isExpanded = state.expandedFolders?.includes(file.path);
   const isSelected = state.activeFile?.path === file.path;
   const editMode = state.renameCache === file.path;
+  const hasPasteCache = state.clipboard.paths.length > 0;
 
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-
   const [inputName, setInputName] = useState<string>(file.basename);
   const [modal, showModal] = useModal();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +51,7 @@ export const FileItemComponent = ({
 
   const handleRename = () => {
     console.log("rename");
-    window.ipcRenderer.send("ask-for-rename",file.path,inputName);
+    window.ipcRenderer.send("ask-for-rename", file.path, inputName);
     dispatch({ type: "SET_RENAME_CACHE", payload: null })
   };
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -139,7 +139,7 @@ export const FileItemComponent = ({
           event={pointerRef.current}
           onClose={() => setContextMenuVisible(false)}
           item={file}
-          hasPasteCache={false}
+          hasPasteCache={hasPasteCache}
           showModal={showModal}
         />
       }
